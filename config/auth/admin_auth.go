@@ -10,7 +10,22 @@ import (
 
 func init() {
 	roles.Register("admin", func(req *http.Request, currentUser interface{}) bool {
-		return currentUser != nil && currentUser.(*models.User).Role == "Admin"
+		return currentUser != nil && currentUser.(*models.User).Role == models.RoleAdmin
+	})
+	roles.Register("customer", func(req *http.Request, currentUser interface{}) bool {
+		return currentUser != nil && currentUser.(*models.User).Role == models.RoleCustomer
+	})
+	roles.Register("reseller", func(req *http.Request, currentUser interface{}) bool {
+		return currentUser != nil && currentUser.(*models.User).Role == models.RoleReseller
+	})
+	roles.Register("influencer", func(req *http.Request, currentUser interface{}) bool {
+		return currentUser != nil && currentUser.(*models.User).Role == models.RoleInfluencer
+	})
+	roles.Register("editor", func(req *http.Request, currentUser interface{}) bool {
+		return currentUser != nil && currentUser.(*models.User).Role == models.RoleEditor
+	})
+	roles.Register("servicer", func(req *http.Request, currentUser interface{}) bool {
+		return currentUser != nil && currentUser.(*models.User).Role == models.RoleServicer
 	})
 }
 

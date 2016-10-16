@@ -47,3 +47,6 @@ config/*.yml
 public/microsites/*
 vendor/*
 .DS_Store
+
+# Commit Message
+message

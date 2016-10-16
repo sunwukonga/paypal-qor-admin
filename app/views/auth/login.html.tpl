@@ -1,3 +1,4 @@
+<p>/home/vagrant/code/go/src/github.com/qor/qor-example/app/views/auth/login.html.tpl</p>
 <div class="container">
     <div class="row">
         <div class="column column-12">

@@ -1,3 +1,4 @@
+<p>/home/vagrant/code/go/src/github.com/qor/qor-example/app/views/auth/register.html.tpl</p>
 <div class="container">
     <div class="row">
         <div class="column column-12">
@@ -25,6 +26,7 @@
 					    <li><button type="submit" class="button button__primary">{{ t "register.button" }}</button></li>
 
 						<input type="hidden" name="{{.xsrfName}}" value="{{.xsrfToken}}" />
+						<input type="hidden" name="{{.UserRoleKey}}" type="text" value="{{.CustomerRole}}" />
 					</ul>
 				</form>
 			</div>

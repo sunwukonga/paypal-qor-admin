@@ -15,6 +15,7 @@ func (s AuthStorer) Create(key string, attr authboss.Attributes) error {
 		return err
 	}
 
+	//user.Role = models.RoleCustomer
 	if err := db.DB.Save(&user).Error; err != nil {
 		return err
 	}

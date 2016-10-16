@@ -9,6 +9,7 @@ import (
 
 	"github.com/justinas/nosurf"
 	"github.com/qor/i18n/inline_edit"
+	"github.com/qor/qor-example/app/models"
 	"github.com/qor/qor-example/config"
 	"github.com/qor/qor-example/config/i18n"
 	"golang.org/x/crypto/bcrypt"
@@ -42,7 +43,7 @@ func init() {
 	Auth.LayoutFuncMaker = layoutFunc
 	Auth.LayoutDataMaker = layoutData
 	Auth.Mailer = authboss.SMTPMailer(config.Config.SMTP.HostWithPort(), smtp.PlainAuth("", config.Config.SMTP.User, config.Config.SMTP.Password, config.Config.SMTP.Host))
-	Auth.EmailFrom = "Qor Example"
+	Auth.EmailFrom = "paul@scbeautynetwork.com"
 	Auth.RootURL = config.Config.SMTP.Site
 	Auth.Policies = []authboss.Validator{
 		authboss.Rules{
@@ -76,6 +77,8 @@ func CurrentLocale(req *http.Request) string {
 
 func layoutData(w http.ResponseWriter, r *http.Request) authboss.HTMLData {
 	return authboss.HTMLData{
+		"CustomerRole": models.RoleCustomer,
+		"UserRoleKey":  "role",
 		"Result": authboss.HTMLData{
 			"CurrentLocale": CurrentLocale(r),
 		},

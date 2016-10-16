@@ -7,6 +7,15 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
+const (
+	RoleAdmin      = "Admin"
+	RoleCustomer   = "Customer"
+	RoleReseller   = "Reseller"
+	RoleInfluencer = "Influencer"
+	RoleEditor     = "Editor"
+	RoleServicer   = "Servicer"
+)
+
 type User struct {
 	gorm.Model
 	Email     string

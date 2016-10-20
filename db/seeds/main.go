@@ -23,12 +23,12 @@ import (
 	"github.com/qor/notification/channels/database"
 	"github.com/qor/publish"
 	"github.com/qor/qor"
-	"github.com/qor/qor-example/app/models"
-	"github.com/qor/qor-example/config/admin"
-	"github.com/qor/qor-example/db"
 	"github.com/qor/seo"
 	"github.com/qor/slug"
 	"github.com/qor/sorting"
+	"github.com/sunwukonga/qor-example/app/models"
+	"github.com/sunwukonga/qor-example/config/admin"
+	"github.com/sunwukonga/qor-example/db"
 )
 
 /* How to run this script

@@ -9,9 +9,9 @@ import (
 
 	"github.com/justinas/nosurf"
 	"github.com/qor/i18n/inline_edit"
-	"github.com/qor/qor-example/app/models"
-	"github.com/qor/qor-example/config"
-	"github.com/qor/qor-example/config/i18n"
+	"github.com/sunwukonga/qor-example/app/models"
+	"github.com/sunwukonga/qor-example/config"
+	"github.com/sunwukonga/qor-example/config/i18n"
 	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/authboss.v0"
 	_ "gopkg.in/authboss.v0/auth"

@@ -2,7 +2,7 @@
 
 package routes
 
-import "github.com/qor/qor-example/config/admin"
+import "github.com/sunwukonga/qor-example/config/admin"
 
 func init() {
 	Router()

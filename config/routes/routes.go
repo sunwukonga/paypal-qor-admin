@@ -6,10 +6,10 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/qor/qor"
-	"github.com/qor/qor-example/app/controllers"
-	"github.com/qor/qor-example/config"
-	"github.com/qor/qor-example/config/auth"
-	"github.com/qor/qor-example/db"
+	"github.com/sunwukonga/qor-example/app/controllers"
+	"github.com/sunwukonga/qor-example/config"
+	"github.com/sunwukonga/qor-example/config/auth"
+	"github.com/sunwukonga/qor-example/db"
 	"github.com/qor/qor/utils"
 	"github.com/qor/wildcard_router"
 )

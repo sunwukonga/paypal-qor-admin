@@ -1,8 +1,8 @@
 package auth
 
 import (
-	"github.com/qor/qor-example/app/models"
-	"github.com/qor/qor-example/db"
+	"github.com/sunwukonga/qor-example/app/models"
+	"github.com/sunwukonga/qor-example/db"
 	"gopkg.in/authboss.v0"
 )
 

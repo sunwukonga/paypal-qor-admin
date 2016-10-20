@@ -8,7 +8,7 @@
     "dist": "rimraf public/dist/* && NODE_ENV=production webpack -p"
   },
   "author": "Jason weng",
-  "repository": "https://github.com/qor/qor-example",
+  "repository": "https://github.com/sunwukonga/qor-example",
   "license": "ISC",
   "devDependencies": {
     "flexslider": "^2.6.0",

@@ -11,7 +11,7 @@ import (
 	"github.com/qor/l10n"
 	"github.com/qor/media_library"
 	"github.com/qor/publish"
-	"github.com/qor/qor-example/config"
+	"github.com/sunwukonga/qor-example/config"
 	"github.com/qor/sorting"
 	"github.com/qor/validations"
 )

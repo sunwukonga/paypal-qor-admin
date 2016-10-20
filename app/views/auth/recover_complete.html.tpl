@@ -1,4 +1,4 @@
-<p>/home/vagrant/code/go/src/github.com/qor/qor-example/app/views/auth/recover_complete.html.tpl</p>
+<p>/home/vagrant/code/go/src/github.com/sunwukonga/qor-example/app/views/auth/recover_complete.html.tpl</p>
 <form action="{{mountpathed "recover/complete"}}" method="POST">
   <label style="margin-bottom:0px;" for="{{.primaryID}}">{{ t "recover_complete.new_password" }}</label>
   <input type="hidden" name="token" value="{{.token}}" />

@@ -26,7 +26,7 @@ func main() {
 	}
 
 	fmt.Printf("Listening on: %v\n", config.Config.Port)
-	if err := http.ListenAndServe(fmt.Sprintf(":%d", config.Config.Port), mux); err != nil {
+	if err := http.ListenAndServe(fmt.Sprintf("%s:%d", config.Config.Host, config.Config.Port), mux); err != nil {
 		panic(err)
 	}
 }

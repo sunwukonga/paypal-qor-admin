@@ -62,7 +62,9 @@ var (
 )
 
 func main() {
-	Notification.RegisterChannel(database.New(&database.Config{}))
+	fmt.Println("Entering main...")
+	Notification.RegisterChannel(database.New(&database.Config{DB: db.DB}))
+	fmt.Println("Truncating tables...")
 	TruncateTables(Tables...)
 	createRecords()
 }

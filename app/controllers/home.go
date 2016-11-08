@@ -2,17 +2,23 @@ package controllers
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/qor/seo"
+	"github.com/qor/widget"
 	"github.com/sunwukonga/qor-example/app/models"
 	"github.com/sunwukonga/qor-example/config"
 	"github.com/sunwukonga/qor-example/config/admin"
 	"github.com/sunwukonga/qor-example/config/auth"
-	"github.com/qor/seo"
-	"github.com/qor/widget"
 	"gopkg.in/authboss.v0"
 )
 
 func HomeIndex(ctx *gin.Context) {
 	var products []models.Product
+	//TODO: Put information into User struct.
+	//b, _ := json.Marshal(User{})
+	// Convert bytes to string.
+	//cartString := string(b)
+	//sessionStore.Put("session_cart", cartString)
+
 	DB(ctx).Limit(9).Preload("ColorVariations").Find(&products)
 	seoObj := models.SEOSetting{}
 	DB(ctx).First(&seoObj)

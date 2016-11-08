@@ -1,0 +1,131 @@
+<p>/home/vagrant/code/go/src/github.com/sunwukonga/qor-example/app/views/cart_show.tmpl</p>
+{{with .Result }}
+  <link type="text/css" rel="stylesheet" href="/vendors/flexslider.css" />
+  <link type="text/css" rel="stylesheet" href="/dist/home_products.css" />
+
+  <div class="container">
+    <div style="position: absolute;right: 0;">
+      {{ render_edit_button .Cart }}
+    </div>
+
+
+
+    <h1>Your Cart</h1>
+
+    <hr>
+
+    {{ if .Cart.OrderItems }}
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th class="table-image"></th>
+                    <th>Product</th>
+                    <th><strong>{{ t "product.quantity" }}</strong></th>
+                    <th>Price</th>
+                    <th class="column-spacer"></th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody>
+			{{ range .Cart.OrderItems }}
+				{{ .Product.Name }}
+				{{ .Product.Price }}
+				{{ index .Product.MainImage.Files 0 }}
+				{{ .Amount }}
+				{{ .Quantity }}
+
+                <tr>
+                    <td class="table-image"><img src="{{ index .Product.MainImage.Files 0 }}" alt="product" class="img-responsive cart-image"></td>
+                    <td><p>{{ .Product.Name }}</p></td>
+                    <td>
+						<div class="quantity buttons_added">
+                        <input type="number" class="input-txt qty text" step="1" min="1" name="quantity" title="Qty" size="4" value="{{ .Quantity }}"></input>
+                        </div>
+                    </td>
+                    <td>${{ .Product.Price }}</td>
+                    <td class=""></td>
+                    <td>
+                        <form action="#" method="POST" class="side-by-side">
+							<!-- {!! csrf_field() !!} -->
+                            <input type="hidden" name="_method" value="DELETE">
+                            <input type="submit" class="btn btn-danger btn-sm" value="Remove">
+                        </form>
+                    </td>
+                </tr>
+            {{ end }}
+                <tr class="border-bottom">
+                    <td class="table-image"></td>
+                    <td style="padding: 40px;"></td>
+                    <td class="small-caps table-bg" style="text-align: right">Your Total</td>
+                    <td class="table-bg">${{ .Amount }}</td>
+                    <td class="column-spacer"></td>
+                    <td></td>
+                </tr>
+
+            </tbody>
+        </table>
+
+        <a href="#" class="btn btn-primary btn-lg">Continue Shopping</a> &nbsp;
+        <a href="#" class="btn btn-success btn-lg">Proceed to Checkout</a>
+
+        <div style="float:right">
+            <form action="/emptyCart" method="POST">
+				<!-- {!! csrf_field() !!} -->
+                <input type="hidden" name="_method" value="DELETE">
+                <input type="submit" class="btn btn-danger btn-lg" value="Empty Cart">
+            </form>
+        </div>
+
+	{{ else }}
+
+        <h3>You have no items in your shopping cart</h3>
+        <a href="/" class="btn btn-primary btn-lg">Continue Shopping</a>
+
+	{{ end }}
+
+    <div class="spacer"></div>
+
+
+
+    <!-- featured product widget -->
+    <div class="row products__featured">
+      <h3>{{ t "product.recommendations" }}</h3>
+      <p>{{ t "product.recommendations_note" }}</p>
+      <div class="products__featured--slider" id="featured-product">
+        <ul class="products__list slides">
+          {{range $product := related_products .ColorVariation}}
+            <li>
+              <a href="{{.DefaultPath}}" class="products__list--img"><img src="{{.MainImageURL}}" /></a>
+              <a class="products__list--title" href="{{.DefaultPath}}">{{.Name}}</a>
+              <p class="products__list--price" href="{{.DefaultPath}}"><span class="item_price">${{.Price}}</span></p>
+            </li>
+          {{end}}
+        </ul>
+      </div>
+    </div>
+    <!-- end: featured product widget -->
+
+    <!-- featured product widget -->
+    <div class="row products__featured">
+      <h3>{{ t "product.also_bought" }}</h3>
+      <p>{{ t "product.also_bought_note" }}</p>
+      <div class="products__featured--slider" id="also-bought">
+        <ul class="products__list slides">
+          {{range $product := other_also_bought .ColorVariation}}
+            <li>
+              <a href="{{.DefaultPath}}" class="products__list--img"><img src="{{.MainImageURL}}" /></a>
+              <a class="products__list--title" href="{{.DefaultPath}}">{{.Name}}</a>
+              <p class="products__list--price" href="{{.DefaultPath}}"><span class="item_price">${{.Price}}</span></p>
+            </li>
+          {{end}}
+        </ul>
+      </div>
+    </div>
+
+    <!-- end: featured product widget -->
+  </div>
+
+  <script src="/vendors/jquery.flexslider-min.js"></script>
+{{end}}

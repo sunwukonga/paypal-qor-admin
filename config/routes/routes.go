@@ -6,12 +6,12 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/qor/qor"
+	"github.com/qor/qor/utils"
+	"github.com/qor/wildcard_router"
 	"github.com/sunwukonga/qor-example/app/controllers"
 	"github.com/sunwukonga/qor-example/config"
 	"github.com/sunwukonga/qor-example/config/auth"
 	"github.com/sunwukonga/qor-example/db"
-	"github.com/qor/qor/utils"
-	"github.com/qor/wildcard_router"
 )
 
 var rootMux *http.ServeMux
@@ -29,6 +29,7 @@ func Router() *http.ServeMux {
 
 		router.GET("/", controllers.HomeIndex)
 		router.GET("/products/:code", controllers.ProductShow)
+		router.GET("/cart", controllers.CartShow)
 		router.GET("/switch_locale", controllers.SwitchLocale)
 
 		rootMux = http.NewServeMux()

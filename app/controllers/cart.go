@@ -14,7 +14,7 @@ import (
 
 func CartShow(ctx *gin.Context) {
 	var (
-		cart           models.Order
+		cart           []models.OrderItem
 		sessionStorer  *auth.SessionStorer
 		colorVariation models.ColorVariation
 	)

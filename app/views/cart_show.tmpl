@@ -13,8 +13,7 @@
     <h1>Your Cart</h1>
 
     <hr>
-
-    {{ if .Cart.OrderItems }}
+    {{ if .Cart }}
 
         <table class="table">
             <thead>
@@ -29,7 +28,7 @@
             </thead>
 
             <tbody>
-			{{ range .Cart.OrderItems }}
+			{{ range .Cart }}
 				{{ .Product.Name }}
 				{{ .Product.Price }}
 				{{ index .Product.MainImage.Files 0 }}

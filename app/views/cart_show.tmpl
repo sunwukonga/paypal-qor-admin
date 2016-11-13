@@ -29,14 +29,14 @@
 
             <tbody>
 			{{ range .Cart }}
+				{{ . }}
 				{{ .Product.Name }}
 				{{ .Product.Price }}
-				{{ index .Product.MainImage.Files 0 }}
 				{{ .Amount }}
 				{{ .Quantity }}
 
                 <tr>
-                    <td class="table-image"><img src="{{ index .Product.MainImage.Files 0 }}" alt="product" class="img-responsive cart-image"></td>
+                    <td class="table-image"><img src="{{ .Product.MainImageURL }}" alt="product" class="img-responsive cart-image"></td>
                     <td><p>{{ .Product.Name }}</p></td>
                     <td>
 						<div class="quantity buttons_added">

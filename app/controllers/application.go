@@ -66,3 +66,14 @@ func DB(ctx *gin.Context) *gorm.DB {
 	}
 	return db.DB
 }
+
+func redirectBack(w http.ResponseWriter, r *http.Request) {
+	if rf := r.Referer(); rf != "" {
+		http.Redirect(w, r, rf, http.StatusSeeOther)
+		return
+	}
+
+	// No Referer specified, supply your own response
+	// or redirect to a default / home page
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}

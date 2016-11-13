@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/gorilla/sessions"
 	"gopkg.in/authboss.v0"
+	"log"
 	"net/http"
 )
 
@@ -50,11 +51,16 @@ func (s SessionStorer) Put(key, value string) {
 	session, err := sessionStore.Get(s.r, sessionCookieName)
 	if err != nil {
 		fmt.Println(err)
+		log.Println(err)
 		return
 	}
 
+	log.Println("No error getting cookie")
 	session.Values[key] = value
-	session.Save(s.r, s.w)
+	err = session.Save(s.r, s.w)
+	if err != nil {
+		log.Printf("Error on Put: %v", err)
+	}
 }
 
 func (s SessionStorer) Del(key string) {

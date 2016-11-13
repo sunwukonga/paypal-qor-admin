@@ -32,6 +32,8 @@ func Router() *http.ServeMux {
 		router.GET("/cart", controllers.CartShow)
 		router.GET("/switch_locale", controllers.SwitchLocale)
 
+		router.GET("/addtocart/:id", controllers.AddToCart)
+
 		rootMux = http.NewServeMux()
 		rootMux.Handle("/auth/", auth.Auth.NewRouter())
 		publicDir := http.Dir(strings.Join([]string{config.Root, "public"}, "/"))

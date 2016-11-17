@@ -55,6 +55,21 @@ var (
 	ItemState  = transition.New(&OrderItem{})
 )
 
+func NewOrder(user *User, db *gorm.DB) *Order {
+	order := Order{UserID: user.ID, User: *user}
+	//put transition in a valid state.
+	OrderState.Trigger("checkout", &order, db)
+	return &order
+}
+
+func NewOrderItem(product Product, orderID uint, db *gorm.DB) *OrderItem {
+
+	orderItem := OrderItem{OrderID: orderID, ProductID: product.ID, Product: product, Quantity: 1, Price: product.Price}
+	//put transition in a valid state.
+	ItemState.Trigger("checkout", &orderItem, db)
+	return &orderItem
+}
+
 func init() {
 	// Define Order's States
 	OrderState.Initial("draft")

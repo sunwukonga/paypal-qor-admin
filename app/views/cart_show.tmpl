@@ -18,6 +18,7 @@
         <table class="table">
             <thead>
                 <tr>
+					<th>ID</th>
                     <th class="table-image"></th>
                     <th>Product</th>
                     <th><strong>{{ t "product.quantity" }}</strong></th>
@@ -36,6 +37,7 @@
 				{{ .Quantity }}
 
                 <tr>
+					<td>{{ .ID }}</td>
                     <td class="table-image"><img src="{{ .Product.MainImageURL }}" alt="product" width="100px" class="img-responsive cart-image"></td>
                     <td><p>{{ .Product.Name }}</p></td>
                     <td>
@@ -46,9 +48,8 @@
                     <td>${{ .Product.Price }}</td>
                     <td class=""></td>
                     <td>
-                        <form action="#" method="POST" class="side-by-side">
+						<form action="/deletefromcart/{{ .ID }}" method="POST" class="side-by-side">
 							<!-- {!! csrf_field() !!} -->
-                            <input type="hidden" name="_method" value="DELETE">
                             <input type="submit" class="btn btn-danger btn-sm" value="Remove">
                         </form>
                     </td>

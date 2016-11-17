@@ -32,7 +32,9 @@ func Router() *http.ServeMux {
 		router.GET("/cart", controllers.CartShow)
 		router.GET("/switch_locale", controllers.SwitchLocale)
 
+		//TODO: Fix this. Should be a POST route.
 		router.GET("/addtocart/:id", controllers.AddToCart)
+		router.POST("/deletefromcart/:id", controllers.DeleteFromCart)
 
 		rootMux = http.NewServeMux()
 		rootMux.Handle("/auth/", auth.Auth.NewRouter())

@@ -35,6 +35,7 @@ func Router() *http.ServeMux {
 		//TODO: Fix this. Should be a POST route.
 		router.GET("/addtocart/:id", controllers.AddToCart)
 		router.POST("/deletefromcart/:id", controllers.DeleteFromCart)
+		router.POST("/updateitemqty/:id", controllers.UpdateItemQty)
 
 		rootMux = http.NewServeMux()
 		rootMux.Handle("/auth/", auth.Auth.NewRouter())

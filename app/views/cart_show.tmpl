@@ -41,9 +41,12 @@
                     <td class="table-image"><img src="{{ .Product.MainImageURL }}" alt="product" width="100px" class="img-responsive cart-image"></td>
                     <td><p>{{ .Product.Name }}</p></td>
                     <td>
-						<div class="quantity buttons_added">
-                        <input type="number" class="input-txt qty text" step="1" min="1" name="quantity" title="Qty" size="4" value="{{ .Quantity }}"></input>
-                        </div>
+						<form action="/updateitemqty/{{ .ID }}" method="POST" class="side-by-side">
+							<div class="quantity buttons_added">
+							<input type="number" class="input-txt qty text" step="1" min="1" name="quantity" title="Qty" size="4" value="{{ .Quantity }}"></input>
+                            <input type="submit" class="btn btn-danger btn-sm" value="Update">
+							</div>
+						</form>
                     </td>
                     <td>${{ .Product.Price }}</td>
                     <td class=""></td>

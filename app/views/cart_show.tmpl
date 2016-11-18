@@ -11,9 +11,8 @@
 
 
     <h1>Your Cart</h1>
-
     <hr>
-    {{ if .Cart }}
+    {{ if .Cart.OrderItems }}
 
         <table class="table">
             <thead>
@@ -22,19 +21,15 @@
                     <th class="table-image"></th>
                     <th>Product</th>
                     <th><strong>{{ t "product.quantity" }}</strong></th>
-                    <th>Price</th>
+                    <th>Unit Price</th>
                     <th class="column-spacer"></th>
                     <th></th>
+					<th>Price</th>
                 </tr>
             </thead>
 
             <tbody>
-			{{ range .Cart }}
-				{{ . }}
-				{{ .Product.Name }}
-				{{ .Product.Price }}
-				{{ .Amount }}
-				{{ .Quantity }}
+			{{ range .Cart.OrderItems }}
 
                 <tr>
 					<td>{{ .ID }}</td>
@@ -56,13 +51,14 @@
                             <input type="submit" class="btn btn-danger btn-sm" value="Remove">
                         </form>
                     </td>
+					<td>${{ .Amount }}</td>
                 </tr>
             {{ end }}
                 <tr class="border-bottom">
                     <td class="table-image"></td>
                     <td style="padding: 40px;"></td>
-                    <td class="small-caps table-bg" style="text-align: right">Your Total</td>
-                    <td class="table-bg">${{ .Amount }}</td>
+                    <td class="small-caps table-bg" style="text-align: right">Your Cart Total</td>
+                    <td class="table-bg">${{ .Cart.Amount }}</td>
                     <td class="column-spacer"></td>
                     <td></td>
                 </tr>
@@ -70,7 +66,7 @@
             </tbody>
         </table>
 
-        <a href="#" class="btn btn-primary btn-lg">Continue Shopping</a> &nbsp;
+        <a href="/" class="btn btn-primary btn-lg">Continue Shopping</a> &nbsp;
         <a href="#" class="btn btn-success btn-lg">Proceed to Checkout</a>
 
         <div style="float:right">

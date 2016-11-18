@@ -49,7 +49,7 @@ func CartShow(ctx *gin.Context) {
 		"cart_show",
 		gin.H{
 			"ActionBarTag":   admin.ActionBar.Render(ctx.Writer, ctx.Request),
-			"Cart":           cart.OrderItems,
+			"Cart":           *cart,
 			"ColorVariation": colorVariation,
 			"CurrentUser":    CurrentUser(ctx),
 			"CurrentLocale":  CurrentLocale(ctx),

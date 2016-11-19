@@ -65,10 +65,13 @@
                 </div>
               </li>
               <li>
-			  <a href="/addtocart/{{ .Product.ID }}" class="button button__primary">+ {{ t "product.add_to_cart" }}</a>
 			  <!--
+			    <a href="/addtocart/{{ .Product.ID }}" class="button button__primary">+ {{ t "product.add_to_cart" }}</a>
                 <button type="submit" class="button button__primary">+ {{ t "product.add_to_cart" }}</button>
 				-->
+			    <form method="post" action="/addtocart/{{ .Product.ID }}">
+			      <button type="submit" class="button button__primary">+ {{ t "product.add_to_cart" }}</button>
+			    </form>
               </li>
             </ul>
             <div class="products__details--share">

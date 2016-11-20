@@ -1,7 +1,12 @@
 <p>/home/vagrant/code/go/src/github.com/sunwukonga/qor-example/app/views/cart_show.tmpl</p>
 {{with .Result }}
+	<!--<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">-->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.5/css/bootstrap.min.css" integrity="sha384-AysaV+vQoT3kOAXZkl02PThvDr8HYKPZhNT5h/CXfBThSRXQ6jW5DO2ekP5ViFdi" crossorigin="anonymous">
+  <!--<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.5/js/bootstrap.min.js" integrity="sha384-BLiI7JTZm+JWlgKa0M0kGRpJbF2J8q+qreVrKBC47e3K6BW78kGLrCkeRX6I9RoK" crossorigin="anonymous"></script>-->
+  <!--<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">-->
   <link type="text/css" rel="stylesheet" href="/vendors/flexslider.css" />
   <link type="text/css" rel="stylesheet" href="/dist/home_products.css" />
+  <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
 
   <div class="container">
     <div style="position: absolute;right: 0;">
@@ -9,9 +14,80 @@
     </div>
 
 
-
     <h1>Your Cart</h1>
     <hr>
+    {{ if .Cart.OrderItems }}
+	<table id="cart" class="table table-hover table-condensed">
+		<thead>
+			<tr>
+				<th style="width:50%">Product</th>
+				<th style="width:12%">Price</th>
+				<th style="width:23%">Quantity</th>
+				<th style="width:13%" class="text-center">Subtotal</th>
+				<th style="width:5%"></th>
+			</tr>
+		</thead>
+		<tbody>
+			{{ range .Cart.OrderItems }}
+			<tr>
+				<td data-th="Product">
+					<div class="row">
+						<div class="col-sm-2 hidden-xs"><img src="{{ .Product.MainImageURL }}" alt="..." class="img-responsive"/></div>
+						<div class="col-sm-10">
+							<h4 class="nomargin">{{ .Product.Name }}</h4>
+							<p>{{ .Product.Description }}</p>
+						</div>
+					</div>
+				</td>
+				<td data-th="Price">${{ .Product.Price }}</td>
+				<td data-th="Quantity">
+					<form class="form-inline" action="/updateitemqty/{{ .ID }}" method="POST">
+						<div class="form-group">
+							<input class="form-control text-center" type="number" style="width: 50%" name="quantity" value="{{ .Quantity }}" min="1" max="99" maxlength="2" />
+						<button type="submit" class="btn btn-info btn-sm"> <i class="fa fa-refresh"></i></button>
+						</div>
+					</form>
+				</td>
+				<td data-th="Subtotal" class="text-center">${{ .Amount }}</td>
+				<td class="actions" data-th="">
+					<form action="/deletefromcart/{{ .ID }}" method="POST">
+						<button type="submit" class="btn btn-danger btn-sm"><i class="fa fa-trash-o"></i></button>								
+					</form>
+				</td>
+			</tr>
+            {{ end }}
+		</tbody>
+		<tfoot>
+			<tr class="visible-xs">
+				<td class="text-center"><strong>Total ${{ .Cart.Amount }}</strong></td>
+			</tr>
+			<tr>
+				<td><a href="/" class="btn btn-warning"><i class="fa fa-angle-left"></i> Continue Shopping</a></td>
+				<td colspan="2" class="hidden-xs"></td>
+				<td class="hidden-xs text-center"><strong>Total ${{ .Cart.Amount }}</strong></td>
+				<td><a href="#" class="btn btn-success btn-block">Checkout <i class="fa fa-angle-right"></i></a></td>
+			</tr>
+		</tfoot>
+	</table>
+	{{ end }}
+
+<form class="form-inline">
+  <div class="form-group">
+    <label class="sr-only" for="exampleInputEmail3">Email address</label>
+    <input type="email" class="form-control" id="exampleInputEmail3" placeholder="Enter email">
+  </div>
+  <div class="form-group">
+    <label class="sr-only" for="exampleInputPassword3">Password</label>
+    <input type="password" class="form-control" id="exampleInputPassword3" placeholder="Password">
+  </div>
+  <div class="form-check">
+    <label class="form-check-label">
+      <input class="form-check-input" type="checkbox"> Remember me
+    </label>
+  </div>
+  <button type="submit" class="btn btn-primary">Sign in</button>
+</form>
+
     {{ if .Cart.OrderItems }}
 
         <table class="table">

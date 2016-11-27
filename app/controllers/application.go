@@ -7,11 +7,11 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/qor/i18n/inline_edit"
-	"github.com/sunwukonga/qor-example/app/models"
-	"github.com/sunwukonga/qor-example/config/admin"
-	"github.com/sunwukonga/qor-example/config/auth"
-	"github.com/sunwukonga/qor-example/config/i18n"
-	"github.com/sunwukonga/qor-example/db"
+	"github.com/sunwukonga/paypal-qor-admin/app/models"
+	"github.com/sunwukonga/paypal-qor-admin/config/admin"
+	"github.com/sunwukonga/paypal-qor-admin/config/auth"
+	"github.com/sunwukonga/paypal-qor-admin/config/i18n"
+	"github.com/sunwukonga/paypal-qor-admin/db"
 )
 
 func SwitchLocale(ctx *gin.Context) {

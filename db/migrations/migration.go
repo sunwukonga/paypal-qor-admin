@@ -4,9 +4,9 @@ import (
 	"github.com/qor/activity"
 	"github.com/qor/media_library"
 	"github.com/qor/publish"
-	"github.com/sunwukonga/qor-example/app/models"
-	"github.com/sunwukonga/qor-example/config/admin"
-	"github.com/sunwukonga/qor-example/db"
+	"github.com/sunwukonga/paypal-qor-admin/app/models"
+	"github.com/sunwukonga/paypal-qor-admin/config/admin"
+	"github.com/sunwukonga/paypal-qor-admin/db"
 	"github.com/qor/transition"
 )
 

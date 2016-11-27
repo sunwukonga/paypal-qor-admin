@@ -26,9 +26,9 @@ import (
 	"github.com/qor/seo"
 	"github.com/qor/slug"
 	"github.com/qor/sorting"
-	"github.com/sunwukonga/qor-example/app/models"
-	"github.com/sunwukonga/qor-example/config/admin"
-	"github.com/sunwukonga/qor-example/db"
+	"github.com/sunwukonga/paypal-qor-admin/app/models"
+	"github.com/sunwukonga/paypal-qor-admin/config/admin"
+	"github.com/sunwukonga/paypal-qor-admin/db"
 )
 
 /* How to run this script
@@ -37,7 +37,7 @@ import (
 
 /* How to upload file
  * $ brew install s3cmd
- * $ s3cmd --configure (Refer https://github.com/theplant/qor-example)
+ * $ s3cmd --configure (Refer https://github.com/theplant/paypal-qor-admin)
  * $ s3cmd put local_file_path s3://qor3/
  */
 

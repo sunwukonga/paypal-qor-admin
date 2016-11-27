@@ -2,7 +2,7 @@
 
 package routes
 
-import "github.com/sunwukonga/qor-example/config/admin"
+import "github.com/sunwukonga/paypal-qor-admin/config/admin"
 
 func init() {
 	Router()

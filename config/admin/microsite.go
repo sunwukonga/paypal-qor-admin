@@ -15,8 +15,8 @@ import (
 	"github.com/qor/admin"
 	"github.com/qor/i18n/inline_edit"
 	"github.com/qor/qor"
-	"github.com/sunwukonga/qor-example/config"
-	"github.com/sunwukonga/qor-example/config/i18n"
+	"github.com/sunwukonga/paypal-qor-admin/config"
+	"github.com/sunwukonga/paypal-qor-admin/config/i18n"
 	"github.com/qor/qor/utils"
 )
 

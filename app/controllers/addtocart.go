@@ -8,8 +8,8 @@ import (
 	//	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/sunwukonga/qor-example/app/models"
-	//	"github.com/sunwukonga/qor-example/config/auth" // for sessionStore
+	"github.com/sunwukonga/paypal-qor-admin/app/models"
+	//	"github.com/sunwukonga/paypal-qor-admin/config/auth" // for sessionStore
 )
 
 func AddToCart(ctx *gin.Context) {

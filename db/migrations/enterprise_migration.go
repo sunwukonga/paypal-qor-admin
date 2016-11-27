@@ -2,7 +2,7 @@
 
 package migrations
 
-import "github.com/sunwukonga/qor-example/config/admin"
+import "github.com/sunwukonga/paypal-qor-admin/config/admin"
 
 func init() {
 	AutoMigrate(&admin.QorMicroSite{})

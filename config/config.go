@@ -17,7 +17,7 @@ type SMTPConfig struct {
 
 var Config = struct {
 	Port uint   `default:"80" env:"PORT"`
-	Host string `default:"192.168.1.5" env:"HOST"`
+	Host string `default:"172.31.19.190" env:"HOST"`
 	DB   struct {
 		Name     string `default:"qor_example"`
 		Adapter  string `default:"mysql"`
@@ -28,7 +28,7 @@ var Config = struct {
 }{}
 
 var (
-	Root = os.Getenv("GOPATH") + "/src/github.com/sunwukonga/qor-example"
+	Root = os.Getenv("GOPATH") + "/src/github.com/sunwukonga/paypal-qor-admin"
 	View *render.Render
 )
 

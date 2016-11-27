@@ -1,4 +1,4 @@
-<p>/home/vagrant/code/go/src/github.com/sunwukonga/qor-example/app/views/auth/login.html.tpl</p>
+<p>/home/vagrant/code/go/src/github.com/sunwukonga/paypal-qor-admin/app/views/auth/login.html.tpl</p>
 <div class="container">
     <div class="row">
         <div class="column column-12">

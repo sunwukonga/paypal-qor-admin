@@ -2,8 +2,8 @@ package admin
 
 import (
 	"github.com/qor/filebox"
-	"github.com/sunwukonga/qor-example/config"
-	"github.com/sunwukonga/qor-example/config/auth"
+	"github.com/sunwukonga/paypal-qor-admin/config"
+	"github.com/sunwukonga/paypal-qor-admin/config/auth"
 	"github.com/qor/roles"
 )
 

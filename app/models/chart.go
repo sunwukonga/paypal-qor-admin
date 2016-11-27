@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/jinzhu/now"
-	"github.com/sunwukonga/qor-example/db"
+	"github.com/sunwukonga/paypal-qor-admin/db"
 )
 
 type Chart struct {

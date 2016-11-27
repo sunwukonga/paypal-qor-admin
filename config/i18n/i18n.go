@@ -4,8 +4,8 @@ import (
 	"github.com/qor/i18n"
 	"github.com/qor/i18n/backends/database"
 	"github.com/qor/i18n/backends/yaml"
-	"github.com/sunwukonga/qor-example/config"
-	"github.com/sunwukonga/qor-example/db"
+	"github.com/sunwukonga/paypal-qor-admin/config"
+	"github.com/sunwukonga/paypal-qor-admin/db"
 	"path/filepath"
 )
 

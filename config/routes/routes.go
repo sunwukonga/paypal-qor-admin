@@ -8,10 +8,10 @@ import (
 	"github.com/qor/qor"
 	"github.com/qor/qor/utils"
 	"github.com/qor/wildcard_router"
-	"github.com/sunwukonga/qor-example/app/controllers"
-	"github.com/sunwukonga/qor-example/config"
-	"github.com/sunwukonga/qor-example/config/auth"
-	"github.com/sunwukonga/qor-example/db"
+	"github.com/sunwukonga/paypal-qor-admin/app/controllers"
+	"github.com/sunwukonga/paypal-qor-admin/config"
+	"github.com/sunwukonga/paypal-qor-admin/config/auth"
+	"github.com/sunwukonga/paypal-qor-admin/db"
 )
 
 var rootMux *http.ServeMux

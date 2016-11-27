@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/sunwukonga/qor-example/config"
-	"github.com/sunwukonga/qor-example/config/admin"
-	"github.com/sunwukonga/qor-example/config/api"
-	_ "github.com/sunwukonga/qor-example/config/i18n"
-	"github.com/sunwukonga/qor-example/config/routes"
-	_ "github.com/sunwukonga/qor-example/db/migrations"
+	"github.com/sunwukonga/paypal-qor-admin/config"
+	"github.com/sunwukonga/paypal-qor-admin/config/admin"
+	"github.com/sunwukonga/paypal-qor-admin/config/api"
+	_ "github.com/sunwukonga/paypal-qor-admin/config/i18n"
+	"github.com/sunwukonga/paypal-qor-admin/config/routes"
+	_ "github.com/sunwukonga/paypal-qor-admin/db/migrations"
 )
 
 func main() {

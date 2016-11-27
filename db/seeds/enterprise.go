@@ -12,8 +12,8 @@ import (
 	"enterprise.getqor.com/promotion"
 	"github.com/fatih/color"
 	"github.com/qor/media_library"
-	"github.com/sunwukonga/qor-example/config/admin"
-	"github.com/sunwukonga/qor-example/db"
+	"github.com/sunwukonga/paypal-qor-admin/config/admin"
+	"github.com/sunwukonga/paypal-qor-admin/db"
 )
 
 /* How to run this script

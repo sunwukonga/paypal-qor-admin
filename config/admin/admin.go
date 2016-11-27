@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"html/template"
+	"math/rand"
 	"path"
 	"regexp"
 	"strconv"
@@ -23,20 +24,28 @@ import (
 	"github.com/qor/notification"
 	"github.com/qor/notification/channels/database"
 	"github.com/qor/qor"
-	"github.com/sunwukonga/qor-example/app/models"
-	"github.com/sunwukonga/qor-example/config/admin/bindatafs"
-	"github.com/sunwukonga/qor-example/config/auth"
-	"github.com/sunwukonga/qor-example/config/i18n"
-	"github.com/sunwukonga/qor-example/db"
 	"github.com/qor/qor/resource"
 	"github.com/qor/qor/utils"
 	"github.com/qor/transition"
 	"github.com/qor/validations"
+	"github.com/sunwukonga/paypal-qor-admin/app/models"
+	"github.com/sunwukonga/paypal-qor-admin/config/admin/bindatafs"
+	"github.com/sunwukonga/paypal-qor-admin/config/auth"
+	"github.com/sunwukonga/paypal-qor-admin/config/i18n"
+	"github.com/sunwukonga/paypal-qor-admin/db"
 )
 
 var Admin *admin.Admin
 var ActionBar *action_bar.ActionBar
 var Countries = []string{"China", "Japan", "USA"}
+var src = rand.NewSource(time.Now().UnixNano())
+
+const letterBytes = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+const (
+	letterIdxBits = 6                    // 6 bits to represent a letter index
+	letterIdxMask = 1<<letterIdxBits - 1 // All 1-bits, as many as letterIdxBits
+	letterIdxMax  = 63 / letterIdxBits   // # of letter indices fitting in 63 bits
+)
 
 func init() {
 	Admin = admin.New(&qor.Config{DB: db.DB.Set("publish:draft_mode", true)})
@@ -394,7 +403,7 @@ func init() {
 	// Add User
 	user := Admin.AddResource(&models.User{}, &admin.Config{Menu: []string{"User Management"}})
 	user.Meta(&admin.Meta{Name: "Gender", Config: &admin.SelectOneConfig{Collection: []string{"Male", "Female", "Unknown"}}})
-	user.Meta(&admin.Meta{Name: "Role", Config: &admin.SelectOneConfig{Collection: []string{"Admin", "Maintainer", "Member"}}})
+	user.Meta(&admin.Meta{Name: "Role", Config: &admin.SelectOneConfig{Collection: []string{"Admin", "Influencer", "Maintainer", "Member"}}})
 	user.Meta(&admin.Meta{Name: "Password",
 		Type:            "password",
 		FormattedValuer: func(interface{}, *qor.Context) interface{} { return "" },
@@ -413,6 +422,29 @@ func init() {
 			}
 		},
 	})
+	user.Meta(&admin.Meta{Name: "InfluencerCode",
+		FieldName: "Influencer Code",
+		Type:      "text",
+		Setter: func(resource interface{}, metaValue *resource.MetaValue, context *qor.Context) {
+			n := 6
+			b := make([]byte, n)
+			// http://stackoverflow.com/questions/22892120/how-to-generate-a-random-string-of-a-fixed-length-in-golang
+			// A src.Int63() generates 63 random bits, enough for letterIdxMax characters!
+			for i, cache, remain := n-1, src.Int63(), letterIdxMax; i >= 0; {
+				if remain == 0 {
+					cache, remain = src.Int63(), letterIdxMax
+				}
+				if idx := int(cache & letterIdxMask); idx < len(letterBytes) {
+					b[i] = letterBytes[idx]
+					i--
+				}
+				cache >>= letterIdxBits
+				remain--
+			}
+			u := resource.(*models.User)
+			u.InfluencerCode = string(b)
+		},
+	})
 	user.Meta(&admin.Meta{Name: "Confirmed", Valuer: func(user interface{}, ctx *qor.Context) interface{} {
 		if user.(*models.User).ID == 0 {
 			return true
@@ -423,7 +455,7 @@ func init() {
 	user.Filter(&admin.Filter{
 		Name: "Role",
 		Config: &admin.SelectOneConfig{
-			Collection: []string{"Admin", "Maintainer", "Member"},
+			Collection: []string{"Admin", "Influencer", "Maintainer", "Member"},
 		},
 	})
 
@@ -435,11 +467,13 @@ func init() {
 				{"Name"},
 				{"Email", "Password"},
 				{"Gender", "Role"},
+				{"InfluencerCode"},
 				{"Confirmed"},
 			}},
 		"Addresses",
 	)
 	user.EditAttrs(user.ShowAttrs())
+	user.NewAttrs(user.ShowAttrs())
 
 	// Add Store
 	store := Admin.AddResource(&models.Store{}, &admin.Config{Menu: []string{"Store Management"}})

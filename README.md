@@ -10,14 +10,14 @@ Chat Room: [![Join the chat at https://gitter.im/qor/qor](https://badges.gitter.
 
 ```shell
 # Get example app
-$ go get -u github.com/sunwukonga/qor-example
+$ go get -u github.com/sunwukonga/paypal-qor-admin
 
 # Setup database
 $ mysql -uroot -p
 mysql> CREATE DATABASE qor_example;
 
 # Run Application
-$ cd $GOPATH/src/github.com/sunwukonga/qor-example
+$ cd $GOPATH/src/github.com/sunwukonga/paypal-qor-admin
 $ go run main.go
 ```
 
@@ -30,13 +30,13 @@ $ go run db/seeds/main.go
 
 ## Admin Management Interface
 
-[Qor Example admin configuration](https://github.com/sunwukonga/qor-example/blob/master/config/admin/admin.go)
+[Qor Example admin configuration](https://github.com/sunwukonga/paypal-qor-admin/blob/master/config/admin/admin.go)
 
 Online Demo Website: [demo.getqor.com/admin](http://demo.getqor.com/admin)
 
 ## RESTful API
 
-[Qor Example API configuration](https://github.com/sunwukonga/qor-example/blob/master/config/api/api.go)
+[Qor Example API configuration](https://github.com/sunwukonga/paypal-qor-admin/blob/master/config/api/api.go)
 
 Online Example APIs:
 

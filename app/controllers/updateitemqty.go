@@ -5,7 +5,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/sunwukonga/qor-example/app/models"
+	"github.com/sunwukonga/paypal-qor-admin/app/models"
 )
 
 func UpdateItemQty(ctx *gin.Context) {

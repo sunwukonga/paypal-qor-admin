@@ -1,8 +1,8 @@
 package auth
 
 import (
-	"github.com/sunwukonga/qor-example/app/models"
-	"github.com/sunwukonga/qor-example/db"
+	"github.com/sunwukonga/paypal-qor-admin/app/models"
+	"github.com/sunwukonga/paypal-qor-admin/db"
 	"gopkg.in/authboss.v0"
 )
 

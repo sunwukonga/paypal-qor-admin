@@ -25,6 +25,8 @@ type User struct {
 	Role      string
 	Addresses []Address
 
+	InfluencerCode string
+
 	// Confirm
 	ConfirmToken string
 	Confirmed    bool
@@ -33,6 +35,13 @@ type User struct {
 	RecoverToken       string
 	RecoverTokenExpiry *time.Time
 }
+
+/*type InfluencerCode struct {
+	gorm.Model
+	Code   string
+	User   User
+	UserID int
+}*/
 
 func (user User) DisplayName() string {
 	return user.Email

@@ -409,6 +409,7 @@ func init() {
 		FormattedValuer: func(interface{}, *qor.Context) interface{} { return "" },
 		Setter: func(resource interface{}, metaValue *resource.MetaValue, context *qor.Context) {
 			values := metaValue.Value.([]string)
+			u := resource.(*models.User)
 			if len(values) > 0 {
 				if newPassword := values[0]; newPassword != "" {
 					bcryptPassword, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
@@ -416,33 +417,52 @@ func init() {
 						context.DB.AddError(validations.NewError(user, "Password", "Can't encrpt password"))
 						return
 					}
-					u := resource.(*models.User)
 					u.Password = string(bcryptPassword)
 				}
+			}
+			// Piggyback here to auto-fill the InfluencerCode field
+			// Should only run if this code does not already exist.
+			n := 6
+			if len(u.InfluencerCode) != n {
+				b := make([]byte, n)
+				// http://stackoverflow.com/questions/22892120/how-to-generate-a-random-string-of-a-fixed-length-in-golang
+				for i, cache, remain := n-1, src.Int63(), letterIdxMax; i >= 0; {
+					if remain == 0 {
+						cache, remain = src.Int63(), letterIdxMax
+					}
+					if idx := int(cache & letterIdxMask); idx < len(letterBytes) {
+						b[i] = letterBytes[idx]
+						i--
+					}
+					cache >>= letterIdxBits
+					remain--
+				}
+				u.InfluencerCode = string(b)
 			}
 		},
 	})
 	user.Meta(&admin.Meta{Name: "InfluencerCode",
-		FieldName: "Influencer Code",
-		Type:      "text",
+		Label: "Influencer Code",
 		Setter: func(resource interface{}, metaValue *resource.MetaValue, context *qor.Context) {
-			n := 6
-			b := make([]byte, n)
-			// http://stackoverflow.com/questions/22892120/how-to-generate-a-random-string-of-a-fixed-length-in-golang
-			// A src.Int63() generates 63 random bits, enough for letterIdxMax characters!
-			for i, cache, remain := n-1, src.Int63(), letterIdxMax; i >= 0; {
-				if remain == 0 {
-					cache, remain = src.Int63(), letterIdxMax
+			// Do nothing here. We want changes made in this field to have no effect.
+			/*
+				n := 6
+				b := make([]byte, n)
+				// http://stackoverflow.com/questions/22892120/how-to-generate-a-random-string-of-a-fixed-length-in-golang
+				for i, cache, remain := n-1, src.Int63(), letterIdxMax; i >= 0; {
+					if remain == 0 {
+						cache, remain = src.Int63(), letterIdxMax
+					}
+					if idx := int(cache & letterIdxMask); idx < len(letterBytes) {
+						b[i] = letterBytes[idx]
+						i--
+					}
+					cache >>= letterIdxBits
+					remain--
 				}
-				if idx := int(cache & letterIdxMask); idx < len(letterBytes) {
-					b[i] = letterBytes[idx]
-					i--
-				}
-				cache >>= letterIdxBits
-				remain--
-			}
-			u := resource.(*models.User)
-			u.InfluencerCode = string(b)
+				u := resource.(*models.User)
+				u.InfluencerCode = string(b)
+			*/
 		},
 	})
 	user.Meta(&admin.Meta{Name: "Confirmed", Valuer: func(user interface{}, ctx *qor.Context) interface{} {
@@ -472,8 +492,18 @@ func init() {
 			}},
 		"Addresses",
 	)
-	user.EditAttrs(user.ShowAttrs())
-	user.NewAttrs(user.ShowAttrs())
+	user.NewAttrs(
+		&admin.Section{
+			Title: "Basic Information",
+			Rows: [][]string{
+				{"Name"},
+				{"Email", "Password"},
+				{"Gender", "Role"},
+				{"Confirmed"},
+			}},
+		"Addresses",
+	)
+	user.EditAttrs(user.NewAttrs())
 
 	// Add Store
 	store := Admin.AddResource(&models.Store{}, &admin.Config{Menu: []string{"Store Management"}})

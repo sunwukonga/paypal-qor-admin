@@ -37,6 +37,9 @@ func Router() *http.ServeMux {
 		router.POST("/deletefromcart/:id", controllers.DeleteFromCart)
 		router.POST("/updateitemqty/:id", controllers.UpdateItemQty)
 
+		//Checking route for influencer codes, returns simple true or false
+		router.GET("/couponcode/:code", controllers.CodeExists)
+
 		rootMux = http.NewServeMux()
 		rootMux.Handle("/auth/", auth.Auth.NewRouter())
 		publicDir := http.Dir(strings.Join([]string{config.Root, "public"}, "/"))

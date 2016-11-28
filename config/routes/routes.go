@@ -39,6 +39,7 @@ func Router() *http.ServeMux {
 
 		//Checking route for influencer codes, returns simple true or false
 		router.GET("/couponcode/:code", controllers.CodeExists)
+		router.POST("/notify", controllers.IpnReceiver)
 
 		rootMux = http.NewServeMux()
 		rootMux.Handle("/auth/", auth.Auth.NewRouter())

@@ -1,0 +1,113 @@
+ction="https://www.paypal.com/cgi-bin/webscr" id="payPalForm" method="post" target="_top"> -->
+<form action="https://www.sandbox.paypal.com/cgi-bin/webscr" id="payPalForm" method="post" target="_top">
+<!--        <input type="hidden" name="business" value="leza@scbeautynetwork.com"> -->
+            <input type="hidden" name="business" value="leza-facilitator@scbeautynetwork.com">
+            <input type="hidden" name="cmd" value="_xclick-subscriptions">
+            <input type="hidden" name="txn_type" value="subscr_signup">
+            <input type="hidden" name="notify_url" value="http://notify.parker.sg/notify/">
+            <input type="hidden" name="return" value="http://scbeautybox.com/">
+            <input type="hidden" name="cancel_return" value="http://scbeautybox.com/">
+            <input type="hidden" name="rm" value="2">
+            <input type="hidden" name="currency_code" id="set_currency" value="SGD">
+            <input type="hidden" name="item_name" id="item_name" value="Reseller Registration Fee">
+            <input type="hidden" name="Description" value="Reseller Registration Fee">
+            <input type="hidden" name="custom" id="set_custom" value="<?= $total_order ?>">
+            <input type="hidden" name="quantity" id="quantity" value="1">
+            <input type="hidden" name="a3" type="hidden" value="<?= $_SESSION['price'] ?>" />
+            <input type="hidden" name="p3" type="hidden" value="<?= $_SESSION['p3'] ?>" />
+            <input type="hidden" name="t3" type="hidden" value="<?= $_SESSION['t3'] ?>" />
+            <input type="hidden" name="src" type="hidden" value="1" />
+            <input type="hidden" name="cbt" value="Return to SCBEAUTY NETWORK">
+            <input type="text" id="coupon-input" name="coupon" maxlength="6" pattern="[A-Z\d]*" />
+            <input type="submit" value="dnp">
+</form>
+
+<script>
+
+document.getElementById('coupon-input').onkeyup = function(event) {
+
+    this.value = this.value.replace(/[^A-Z\d]/, '');
+
+}
+
+function processForm(e) {
+    if (e.preventDefault) e.preventDefault();
+    var xhr = new XMLHttpRequest();
+    var couponCode = document.getElementById("coupon-input").value;
+
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState == XMLHttpRequest.DONE) {
+            if (xhr.responseText == "false") {
+                alert("false");
+            } else alert("noresponse or true");
+        }
+    }
+
+    xhr.open('GET', 'http://notify.parker.sg/couponcode/' + couponCode, true);
+    xhr.send(null);
+    
+    // You must return false to prevent the default form behavior
+    return false;
+}
+
+var form = document.getElementById('payPalForm');
+if (form.attachEvent) {
+    form.attachEvent("submit", callOtherDomain);
+} else {
+    form.addEventListener("submit", callOtherDomain);
+}
+
+  var isIE8 = window.XDomainRequest ? true : false;
+
+  var invocation = createCrossDomainRequest();
+  var url = 'http://notify.parker.sg/couponcode/';
+  function createCrossDomainRequest(url, handler) {
+    var request;
+    if (isIE8) {
+      request = new window.XDomainRequest();
+      }
+      else {
+        request = new XMLHttpRequest();
+      }
+    return request;
+  }
+
+  function callOtherDomain(e) {
+    if (e.preventDefault) e.preventDefault();
+    var couponCode = document.getElementById("coupon-input").value;
+    if (invocation) {
+      if(isIE8) {
+        invocation.onload = outputResult;
+        invocation.open("GET", url + couponCode, true);
+        invocation.send();
+      }
+      else {
+        invocation.open('GET', url + couponCode, true);
+        invocation.onreadystatechange = handler;
+        invocation.send();
+      }
+    }
+    else {
+      alert("No Invocation TookPlace At All");
+    }
+    // You must return false to prevent the default form behavior
+    return false;
+  }
+
+  function handler(evtXHR) {
+    if (invocation.readyState == 4)
+    {
+      if (invocation.status == 200) {
+          outputResult();
+      }
+      else {
+        alert("Unable to verify code");
+      }
+    }
+  }
+
+  function outputResult() {
+    var response = invocation.responseText;
+    alert(response);
+  }
+</script>

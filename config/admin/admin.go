@@ -402,7 +402,82 @@ func init() {
 
 	// Add User
 	user := Admin.AddResource(&models.User{}, &admin.Config{Menu: []string{"User Management"}})
+	user.Action(&admin.Action{
+		Name: "GenerateCode",
+		Handle: func(argument *admin.ActionArgument) error {
+			var (
+				tx = argument.Context.GetDB().Begin()
+			)
+
+			for _, record := range argument.FindSelectedRecords() {
+				user := record.(*models.User)
+				// Create a new code.
+				// Check that the code does not already exist. Very, very unlikely.
+				// Insert code into database.
+				influencerCoupon := &models.InfluencerCoupon{}
+				if err := tx.Where("user_id = ?", user.ID).First(influencerCoupon).Error; err != nil {
+					//Inspect error. Hopefully, that it wasn't found.
+					// Create Coupon
+					n := 6
+					b := make([]byte, n)
+					// http://stackoverflow.com/questions/22892120/how-to-generate-a-random-string-of-a-fixed-length-in-golang
+					for i, cache, remain := n-1, src.Int63(), letterIdxMax; i >= 0; {
+						if remain == 0 {
+							cache, remain = src.Int63(), letterIdxMax
+						}
+						if idx := int(cache & letterIdxMask); idx < len(letterBytes) {
+							b[i] = letterBytes[idx]
+							i--
+						}
+						cache >>= letterIdxBits
+						remain--
+					}
+					influencerCoupon.Code = string(b)
+					influencerCoupon.UserID = user.ID
+					influencerCoupon.User = *user
+
+					//Add InfluencerCoupon to DB
+					if err := tx.Save(influencerCoupon).Error; err != nil {
+						tx.Rollback()
+						return err
+					}
+				} else {
+					// User already has a coupon code. Not good. Nothing to do.
+					fmt.Println("Error. We should not be here. Influencer already had coupon code.")
+				}
+
+			}
+
+			tx.Commit()
+			return nil
+		},
+		Visible: func(record interface{}, context *admin.Context) bool {
+			if user, ok := record.(*models.User); ok {
+				//return true if InfluencerCoupon doesn't exist, or it is invalid.
+				if user.Role == models.RoleInfluencer {
+					influencerCoupon := &models.InfluencerCoupon{}
+					if err := context.GetDB().Where("user_id = ?", user.ID).First(influencerCoupon).Error; err != nil {
+						if err.Error() == "record not found" {
+							return true
+						} else {
+							// Ooops, we found a real error
+							fmt.Println("Error fetching coupon: ", err.Error())
+							return true
+						}
+					} else {
+						// Following test for invalidity is not complete. Code should only contain [A-Z\d]
+						if len(influencerCoupon.Code) != 6 {
+							return true
+						}
+					}
+				}
+			}
+			return false
+		},
+		Modes: []string{"show", "menu_item"},
+	})
 	user.Meta(&admin.Meta{Name: "Gender", Config: &admin.SelectOneConfig{Collection: []string{"Male", "Female", "Unknown"}}})
+	// TODO: replace Role strings with string constants
 	user.Meta(&admin.Meta{Name: "Role", Config: &admin.SelectOneConfig{Collection: []string{"Admin", "Influencer", "Maintainer", "Member"}}})
 	user.Meta(&admin.Meta{Name: "Password",
 		Type:            "password",
@@ -422,47 +497,44 @@ func init() {
 			}
 			// Piggyback here to auto-fill the InfluencerCode field
 			// Should only run if this code does not already exist.
-			n := 6
-			if len(u.InfluencerCode) != n {
-				b := make([]byte, n)
-				// http://stackoverflow.com/questions/22892120/how-to-generate-a-random-string-of-a-fixed-length-in-golang
-				for i, cache, remain := n-1, src.Int63(), letterIdxMax; i >= 0; {
-					if remain == 0 {
-						cache, remain = src.Int63(), letterIdxMax
+			/*
+				n := 6
+				if len(u.InfluencerCode) != n {
+					b := make([]byte, n)
+					// http://stackoverflow.com/questions/22892120/how-to-generate-a-random-string-of-a-fixed-length-in-golang
+					for i, cache, remain := n-1, src.Int63(), letterIdxMax; i >= 0; {
+						if remain == 0 {
+							cache, remain = src.Int63(), letterIdxMax
+						}
+						if idx := int(cache & letterIdxMask); idx < len(letterBytes) {
+							b[i] = letterBytes[idx]
+							i--
+						}
+						cache >>= letterIdxBits
+						remain--
 					}
-					if idx := int(cache & letterIdxMask); idx < len(letterBytes) {
-						b[i] = letterBytes[idx]
-						i--
-					}
-					cache >>= letterIdxBits
-					remain--
+					u.InfluencerCode = string(b)
 				}
-				u.InfluencerCode = string(b)
-			}
+			*/
 		},
 	})
 	user.Meta(&admin.Meta{Name: "InfluencerCode",
 		Label: "Influencer Code",
-		Setter: func(resource interface{}, metaValue *resource.MetaValue, context *qor.Context) {
-			// Do nothing here. We want changes made in this field to have no effect.
-			/*
-				n := 6
-				b := make([]byte, n)
-				// http://stackoverflow.com/questions/22892120/how-to-generate-a-random-string-of-a-fixed-length-in-golang
-				for i, cache, remain := n-1, src.Int63(), letterIdxMax; i >= 0; {
-					if remain == 0 {
-						cache, remain = src.Int63(), letterIdxMax
-					}
-					if idx := int(cache & letterIdxMask); idx < len(letterBytes) {
-						b[i] = letterBytes[idx]
-						i--
-					}
-					cache >>= letterIdxBits
-					remain--
+		Type:  "readonly",
+		Valuer: func(record interface{}, context *qor.Context) interface{} {
+			influencerCoupon := &models.InfluencerCoupon{}
+			user := record.(*models.User)
+			if err := context.GetDB().Where("user_id = ?", user.ID).First(influencerCoupon).Error; err != nil {
+				if err.Error() == "record not found" {
+					return ""
+				} else {
+					// Ooops, we found a real error
+					fmt.Println("Error fetching coupon: ", err.Error())
+					return ""
 				}
-				u := resource.(*models.User)
-				u.InfluencerCode = string(b)
-			*/
+			} else {
+				return influencerCoupon.Code
+			}
 		},
 	})
 	user.Meta(&admin.Meta{Name: "Confirmed", Valuer: func(user interface{}, ctx *qor.Context) interface{} {

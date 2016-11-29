@@ -12,6 +12,7 @@ const (
 	RoleCustomer   = "Customer"
 	RoleReseller   = "Reseller"
 	RoleInfluencer = "Influencer"
+	RoleSubscriber = "Subscriber"
 	RoleEditor     = "Editor"
 	RoleServicer   = "Servicer"
 )
@@ -25,8 +26,6 @@ type User struct {
 	Role      string
 	Addresses []Address
 
-	InfluencerCode string
-
 	// Confirm
 	ConfirmToken string
 	Confirmed    bool
@@ -36,12 +35,12 @@ type User struct {
 	RecoverTokenExpiry *time.Time
 }
 
-/*type InfluencerCode struct {
+type InfluencerCoupon struct {
 	gorm.Model
 	Code   string
 	User   User
-	UserID int
-}*/
+	UserID uint
+}
 
 func (user User) DisplayName() string {
 	return user.Email

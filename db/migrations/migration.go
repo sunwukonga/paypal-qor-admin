@@ -4,10 +4,10 @@ import (
 	"github.com/qor/activity"
 	"github.com/qor/media_library"
 	"github.com/qor/publish"
+	"github.com/qor/transition"
 	"github.com/sunwukonga/paypal-qor-admin/app/models"
 	"github.com/sunwukonga/paypal-qor-admin/config/admin"
 	"github.com/sunwukonga/paypal-qor-admin/db"
-	"github.com/qor/transition"
 )
 
 func init() {
@@ -24,7 +24,7 @@ func init() {
 
 	AutoMigrate(&models.Setting{})
 
-	AutoMigrate(&models.User{})
+	AutoMigrate(&models.User{}, &models.InfluencerCoupon{})
 
 	AutoMigrate(&models.SEOSetting{})
 

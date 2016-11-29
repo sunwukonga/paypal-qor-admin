@@ -1,1 +1,13 @@
 Add database structures to hold IPN transactions. 
+
+1. Test a transaction to discover the data that is arriving at our endpoint. 
+
+2. Define data structures that can organise this data to be able to easily
+extract the information we regularly need.
+	a. Boxes sold under an influencer.
+
+3. Tentatively, we will need.
+	a. rawIPN
+    b. Add has_many relationship to inluencer with subscribers.
+		i. Separate table holding subscribers.
+ 	c. Subscriber users 

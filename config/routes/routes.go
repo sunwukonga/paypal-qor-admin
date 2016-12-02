@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	//	"github.com/qor/log"
 	"github.com/qor/qor"
 	"github.com/qor/qor/utils"
 	"github.com/qor/wildcard_router"
@@ -25,6 +26,7 @@ func Router() *http.ServeMux {
 				ctx.Set("DB", db.DB.Set("l10n:locale", locale))
 			}
 		})
+		//		router.Use(log.Logger("application.log", 30))
 		gin.SetMode(gin.DebugMode)
 
 		router.GET("/", controllers.HomeIndex)

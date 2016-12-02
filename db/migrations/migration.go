@@ -26,6 +26,8 @@ func init() {
 
 	AutoMigrate(&models.User{}, &models.InfluencerCoupon{})
 
+	AutoMigrate(&models.Subscription{}, &models.PaypalPayer{}, &models.PaypalPayment{})
+
 	AutoMigrate(&models.SEOSetting{})
 
 	AutoMigrate(&transition.StateChangeLog{})

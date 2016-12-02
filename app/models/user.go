@@ -8,13 +8,13 @@ import (
 )
 
 const (
-	RoleAdmin      = "Admin"
-	RoleCustomer   = "Customer"
-	RoleReseller   = "Reseller"
-	RoleInfluencer = "Influencer"
-	RoleSubscriber = "Subscriber"
-	RoleEditor     = "Editor"
-	RoleServicer   = "Servicer"
+	RoleAdmin      string = "Admin"
+	RoleCustomer   string = "Customer"
+	RoleReseller   string = "Reseller"
+	RoleInfluencer string = "Influencer"
+	RoleSubscriber string = "Subscriber"
+	RoleEditor     string = "Editor"
+	RoleServicer   string = "Servicer"
 )
 
 type User struct {

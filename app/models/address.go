@@ -11,9 +11,11 @@ type Address struct {
 	UserID      uint
 	ContactName string
 	Phone       string
+	Country     string
 	City        string
 	Address1    string
 	Address2    string
+	Postcode    string
 }
 
 func (address Address) Stringify() string {

@@ -400,6 +400,34 @@ func init() {
 	abandonedOrder.EditAttrs("-DiscountValue")
 	abandonedOrder.ShowAttrs("-DiscountValue")
 
+	// Add Beauty Box Transactions
+	payments := Admin.AddResource(&models.PaypalPayment{}, &admin.Config{Menu: []string{"Beauty Box Transactions"}})
+	payments.Meta(&admin.Meta{
+		Name:  "SubscrID",
+		Label: "Subscription",
+		Type:  "readonly",
+	})
+	payments.Meta(&admin.Meta{
+		Name:  "UserID",
+		Label: "Subscriber",
+		Type:  "readonly",
+	})
+	payments.Meta(&admin.Meta{
+		Name:  "InfluencerID",
+		Label: "Influencer",
+		Type:  "readonly",
+	})
+	payments.Meta(&admin.Meta{
+		Name:  "PaymentStatus",
+		Label: "Status",
+		Type:  "readonly",
+	})
+
+	payments.IndexAttrs("SubscrID", "UserID", "InfluencerID", "PaymentStatus")
+	payments.NewAttrs()
+	payments.EditAttrs()
+	payments.ShowAttrs(payments.IndexAttrs())
+
 	// Add User
 	user := Admin.AddResource(&models.User{}, &admin.Config{Menu: []string{"User Management"}})
 	user.Action(&admin.Action{

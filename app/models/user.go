@@ -17,6 +17,8 @@ const (
 	RoleServicer   string = "Servicer"
 )
 
+var Roles = []string{RoleAdmin, RoleCustomer, RoleReseller, RoleInfluencer, RoleSubscriber, RoleEditor, RoleServicer}
+
 type User struct {
 	gorm.Model
 	Email     string

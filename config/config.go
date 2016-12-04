@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/jinzhu/configor"
@@ -37,6 +38,7 @@ func init() {
 		panic(err)
 	}
 
+	fmt.Println(Root)
 	View = render.New()
 }
 

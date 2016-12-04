@@ -401,7 +401,7 @@ func init() {
 	abandonedOrder.ShowAttrs("-DiscountValue")
 
 	// Add Beauty Box Transactions
-	payments := Admin.AddResource(&models.PaypalPayment{}, &admin.Config{Menu: []string{"Beauty Box Transactions"}})
+	payments := Admin.AddResource(&models.PaypalPayment{}, &admin.Config{Name: "Transactions", Menu: []string{"Beauty Box"}})
 	payments.Meta(&admin.Meta{
 		Name:  "SubscrID",
 		Label: "Subscription",
@@ -428,6 +428,130 @@ func init() {
 	payments.EditAttrs()
 	payments.ShowAttrs(payments.IndexAttrs())
 
+	// Add Beauty Box Subscriptions
+	subscriptions := Admin.AddResource(&models.Subscription{}, &admin.Config{Name: "Subscriptions", Menu: []string{"Beauty Box"}})
+	subscriptions.Meta(&admin.Meta{
+		Name:  "SubscrID",
+		Label: "ID",
+		Type:  "readonly",
+	})
+	subscriptions.Meta(&admin.Meta{
+		Name:  "UserID",
+		Label: "Subscriber",
+		Type:  "readonly",
+	})
+	subscriptions.Meta(&admin.Meta{
+		Name:  "InfluencerID",
+		Label: "Influencer",
+		Type:  "readonly",
+	})
+	subscriptions.Meta(&admin.Meta{
+		Name:  "Period",
+		Label: "Period",
+		Type:  "readonly",
+	})
+	subscriptions.Meta(&admin.Meta{
+		Name:  "SubscrDate",
+		Label: "Signup Date",
+		Type:  "readonly",
+	})
+	subscriptions.Meta(&admin.Meta{
+		Name:  "RecurTimes",
+		Label: "Total",
+		Type:  "readonly",
+	})
+	subscriptions.Meta(&admin.Meta{
+		Name:  "State",
+		Label: "Status",
+		Type:  "readonly",
+	})
+	subscriptions.Meta(&admin.Meta{
+		Name:  "CancelledAt",
+		Label: "Cancel Date",
+		Type:  "readonly",
+	})
+	subscriptions.Meta(&admin.Meta{
+		Name:  "EotAt",
+		Label: "End Date",
+		Type:  "readonly",
+	})
+	associatedTransactions := subscriptions.Meta(&admin.Meta{
+		Name:  "SubscrPayments",
+		Label: "Transactions",
+		Type:  "collection_edit",
+		Valuer: func(record interface{}, context *qor.Context) interface{} {
+			paypalPayments := &[]models.PaypalPayment{}
+			subscription := record.(*models.Subscription)
+			context.GetDB().Where("subscr_id = ?", subscription.SubscrID).Find(paypalPayments)
+			return paypalPayments
+		},
+	}).Resource
+	associatedTransactions.Meta(&admin.Meta{
+		Name:  "NetPayment",
+		Label: "Net Payment",
+		Type:  "readonly",
+		Valuer: func(record interface{}, context *qor.Context) interface{} {
+			txn := record.(*models.PaypalPayment)
+			return txn.Net()
+		},
+	})
+	associatedTransactions.Meta(&admin.Meta{
+		Name: "McFee",
+		Type: "hidden",
+	})
+	associatedTransactions.Meta(&admin.Meta{
+		Name: "McGross",
+		Type: "hidden",
+	})
+	associatedTransactions.Meta(&admin.Meta{
+		Name: "User",
+		Type: "hidden",
+	})
+	associatedTransactions.Meta(&admin.Meta{
+		Name: "Influencer",
+		Type: "hidden",
+	})
+	associatedTransactions.ShowAttrs(
+		&admin.Section{
+			Title: "Tranx",
+			Rows: [][]string{
+				{"ID", "NetPayment", "Status"},
+			},
+		},
+	)
+	associatedTransactions.EditAttrs(associatedTransactions.ShowAttrs)
+	associatedTransactions.IndexAttrs(associatedTransactions.ShowAttrs)
+
+	/*	associatedTransactions.Meta(&admin.Meta{
+			Name:  "TxnID",
+			Label: "ID",
+			Type:  "readonly",
+		})
+		associatedTransactions.Meta(&admin.Meta{
+			Name: "Net Payment",
+			Type: "float*",
+			Valuer: func(record interface{}, context *qor.Context) interface{} {
+				fmt.Println(record)
+				//payment := record.(*models.PaypalPayment)
+				return "" // payment.Net()
+			},
+		})
+	*/
+	subscriptions.IndexAttrs("SubscrID", "UserID", "InfluencerID", "State")
+	subscriptions.NewAttrs()
+	subscriptions.EditAttrs()
+	subscriptions.ShowAttrs(
+		&admin.Section{
+			Title: "Subscription",
+			Rows: [][]string{
+				{"SubscrID", "State"},
+				{"UserID", "InfluencerID"},
+				{"RecurTimes", "Period"},
+				{"SubscrDate"},
+				{"CancelledAt", "EotAt"},
+			}},
+		"SubscrPayments",
+	)
 	// Add User
 	user := Admin.AddResource(&models.User{}, &admin.Config{Menu: []string{"User Management"}})
 	user.Action(&admin.Action{
@@ -506,7 +630,7 @@ func init() {
 	})
 	user.Meta(&admin.Meta{Name: "Gender", Config: &admin.SelectOneConfig{Collection: []string{"Male", "Female", "Unknown"}}})
 	// TODO: replace Role strings with string constants
-	user.Meta(&admin.Meta{Name: "Role", Config: &admin.SelectOneConfig{Collection: []string{"Admin", "Influencer", "Maintainer", "Member"}}})
+	user.Meta(&admin.Meta{Name: "Role", Config: &admin.SelectOneConfig{Collection: models.Roles}})
 	user.Meta(&admin.Meta{Name: "Password",
 		Type:            "password",
 		FormattedValuer: func(interface{}, *qor.Context) interface{} { return "" },
@@ -575,7 +699,8 @@ func init() {
 	user.Filter(&admin.Filter{
 		Name: "Role",
 		Config: &admin.SelectOneConfig{
-			Collection: []string{"Admin", "Influencer", "Maintainer", "Member"},
+			Collection: models.Roles,
+			//Collection: []string{"Admin", "Influencer", "Maintainer", "Member"},
 		},
 	})
 

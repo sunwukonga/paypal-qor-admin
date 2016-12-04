@@ -16,6 +16,8 @@ type Subscription struct {
 	InfluencerID uint
 	Influencer   User `gorm:"save_associations:false"`
 
+	SubscrPayments []PaypalPayment `gorm:"foreignkey:SubscrID"`
+
 	SubscrID   string
 	RecurTimes int
 	Period     string

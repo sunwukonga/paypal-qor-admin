@@ -165,7 +165,7 @@ func createUsers() {
 	for i := 0; i < totalCount; i++ {
 		user := models.User{}
 		user.Name.Scan(Fake.Name())
-		user.Email = emailRegexp.ReplaceAllString(Fake.Email(), strings.Replace(strings.ToLower(user.Name.String), " ", "_", -1)+"$1")
+		user.Email = emailRegexp.ReplaceAllString(Fake.Email(), strings.Replace(strings.ToLower(user.Name.String), " ", "_", -1)+"@example.com")
 		user.Gender = []string{"Female", "Male"}[i%2]
 		if err := db.DB.Create(&user).Error; err != nil {
 			log.Fatalf("create user (%v) failure, got err %v", user, err)
@@ -274,19 +274,19 @@ func createProducts() {
 			colorVariation.ColorCode = cv.ColorCode
 
 			for _, i := range cv.Images {
-				image := models.ProductImage{Title: p.Name}
+				image := models.ProductImage{Title: p.Name, SelectedType: "image"}
 				if file, err := openFileByURL(i.URL); err != nil {
 					fmt.Printf("open file (%q) failure, got err %v", i.URL, err)
 				} else {
 					defer file.Close()
-					image.Image.Scan(file)
+					image.File.Scan(file)
 				}
 				if err := db.DB.Create(&image).Error; err != nil {
 					log.Fatalf("create color_variation_image (%v) failure, got err %v", image, err)
 				} else {
 					colorVariation.Images.Files = append(colorVariation.Images.Files, media_library.File{
 						ID:  json.Number(fmt.Sprint(image.ID)),
-						Url: image.Image.URL(),
+						Url: image.File.URL(),
 					})
 
 					colorVariation.Images.Crop(admin.Admin.NewResource(&models.ProductImage{}), db.DB, media_library.MediaOption{
@@ -300,7 +300,7 @@ func createProducts() {
 					if len(product.MainImage.Files) == 0 {
 						product.MainImage.Files = []media_library.File{{
 							ID:  json.Number(fmt.Sprint(image.ID)),
-							Url: image.Image.URL(),
+							Url: image.File.URL(),
 						}}
 						db.DB.Save(&product)
 					}
@@ -334,7 +334,7 @@ func createProducts() {
 func createStores() {
 	for _, s := range Seeds.Stores {
 		store := models.Store{}
-		store.Name = s.Name
+		store.StoreName = s.Name
 		store.Phone = s.Phone
 		store.Email = s.Email
 		store.Country = s.Country

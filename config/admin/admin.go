@@ -110,12 +110,20 @@ func init() {
 	//* Produc Management *//
 	color := Admin.AddResource(&models.Color{}, &admin.Config{Menu: []string{"Product Management"}, Priority: -5})
 	Admin.AddResource(&models.Size{}, &admin.Config{Menu: []string{"Product Management"}, Priority: -4})
+
 	category := Admin.AddResource(&models.Category{}, &admin.Config{Menu: []string{"Product Management"}, Priority: -3})
-	Admin.AddResource(&models.Collection{}, &admin.Config{Menu: []string{"Product Management"}, Priority: -2})
+	category.Meta(&admin.Meta{Name: "Categories", Type: "select_many"})
+
+	collection := Admin.AddResource(&models.Collection{}, &admin.Config{Menu: []string{"Product Management"}, Priority: -2})
 
 	// Add ProductImage as Media Libraray
 	ProductImagesResource := Admin.AddResource(&models.ProductImage{}, &admin.Config{Menu: []string{"Product Management"}, Priority: -1})
 
+	ProductImagesResource.Filter(&admin.Filter{
+		Name:   "SelectedType",
+		Label:  "Media Type",
+		Config: &admin.SelectOneConfig{Collection: [][]string{{"video", "Video"}, {"image", "Image"}, {"file", "File"}, {"video_link", "Video Link"}}},
+	})
 	ProductImagesResource.Filter(&admin.Filter{
 		Name:   "Color",
 		Config: &admin.SelectOneConfig{RemoteDataResource: color},
@@ -124,12 +132,19 @@ func init() {
 		Name:   "Category",
 		Config: &admin.SelectOneConfig{RemoteDataResource: category},
 	})
-	ProductImagesResource.IndexAttrs("Image", "Title")
+	ProductImagesResource.IndexAttrs("File", "Title")
 
 	// Add Product
 	product := Admin.AddResource(&models.Product{}, &admin.Config{Menu: []string{"Product Management"}})
 	product.Meta(&admin.Meta{Name: "MadeCountry", Config: &admin.SelectOneConfig{Collection: Countries}})
-	product.Meta(&admin.Meta{Name: "Description", Config: &admin.RichEditorConfig{AssetManager: assetManager}})
+	product.Meta(&admin.Meta{Name: "Description", Config: &admin.RichEditorConfig{AssetManager: assetManager, Plugins: []admin.RedactorPlugin{
+		{Name: "medialibrary", Source: "/admin/assets/javascripts/qor_redactor_medialibrary.js"},
+		{Name: "table", Source: "/javascripts/redactor_table.js"},
+	},
+		Settings: map[string]interface{}{
+			"medialibraryUrl": "/admin/product_images",
+		},
+	}})
 	product.Meta(&admin.Meta{Name: "Category", Config: &admin.SelectOneConfig{AllowBlank: true}})
 	product.Meta(&admin.Meta{Name: "Collections", Config: &admin.SelectManyConfig{SelectMode: "bottom_sheet"}})
 
@@ -149,6 +164,11 @@ func init() {
 		}
 		return ""
 	}})
+
+	product.Filter(&admin.Filter{
+		Name:   "Collections",
+		Config: &admin.SelectOneConfig{RemoteDataResource: collection},
+	})
 
 	product.UseTheme("grid")
 
@@ -185,7 +205,7 @@ func init() {
 			Rows: [][]string{
 				{"Name"},
 				{"Code", "Price"},
-				{"Enabled"},
+				{"MainImage"},
 			}},
 		&admin.Section{
 			Title: "Organization",
@@ -193,10 +213,7 @@ func init() {
 				{"Category", "MadeCountry"},
 				{"Collections"},
 			}},
-		&admin.Section{
-			Rows: [][]string{
-				{"MainImage"},
-			}},
+		"ProductProperties",
 		"Description",
 		"ColorVariations",
 	)
@@ -732,6 +749,7 @@ func init() {
 
 	// Add Store
 	store := Admin.AddResource(&models.Store{}, &admin.Config{Menu: []string{"Store Management"}})
+	store.Meta(&admin.Meta{Name: "Owner", Type: "single_edit"})
 	store.AddValidator(func(record interface{}, metaValues *resource.MetaValues, context *qor.Context) error {
 		if meta := metaValues.Get("Name"); meta != nil {
 			if name := utils.ToString(meta.Value); strings.TrimSpace(name) == "" {

@@ -18,6 +18,8 @@ mysql> CREATE DATABASE qor_example;
 
 # Run Application
 $ cd $GOPATH/src/github.com/sunwukonga/paypal-qor-admin
+$ cd $GOPATH/src/github.com/qor/qor-example
+$ gom install
 $ go run main.go
 ```
 
@@ -25,7 +27,13 @@ $ go run main.go
 
 ```go
 $ go get ./db/seeds/...
-$ go run db/seeds/main.go
+$ go run db/seeds/main.go db/seeds/seeds.go
+```
+
+### Run tests (Pending)
+
+```
+$ go test $(go list ./... | grep -v /vendor/ | grep  -v /db/)
 ```
 
 ## Admin Management Interface

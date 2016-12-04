@@ -1,7 +1,9 @@
 package models
 
 import (
+	"database/sql/driver"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"strings"
@@ -16,34 +18,6 @@ import (
 	"github.com/qor/validations"
 )
 
-type ProductImage struct {
-	gorm.Model
-	Title      string
-	Color      Color
-	ColorID    uint
-	Category   Category
-	CategoryID uint
-	Image      media_library.MediaLibraryStorage `sql:"size:4294967295;" media_library:"url:/system/{{class}}/{{primary_key}}/{{column}}.{{extension}}"`
-}
-
-func (productImage *ProductImage) ScanMediaOptions(mediaOption media_library.MediaOption) error {
-	if bytes, err := json.Marshal(mediaOption); err == nil {
-		productImage.Image.Crop = true
-		return productImage.Image.Scan(bytes)
-	} else {
-		return err
-	}
-}
-
-func (productImage *ProductImage) GetMediaOption() (mediaOption media_library.MediaOption) {
-	mediaOption.FileName = productImage.Image.FileName
-	mediaOption.URL = productImage.Image.URL()
-	mediaOption.OriginalURL = productImage.Image.URL("original")
-	mediaOption.CropOptions = productImage.Image.CropOptions
-	mediaOption.Sizes = productImage.Image.GetSizes()
-	return
-}
-
 type Product struct {
 	gorm.Model
 	l10n.Locale
@@ -55,7 +29,7 @@ type Product struct {
 	Code                  string       `l10n:"sync"`
 	CategoryID            uint         `l10n:"sync"`
 	Category              Category     `l10n:"sync"`
-	Collections           []Collection `l10n:"sync" gorm:"many2many:product_collections;ForeignKey:id;AssociationForeignKey:id"`
+	Collections           []Collection `l10n:"sync" gorm:"many2many:product_collections;"`
 	MadeCountry           string       `l10n:"sync"`
 	MainImage             media_library.MediaBox
 	Price                 float32          `l10n:"sync"`
@@ -63,6 +37,7 @@ type Product struct {
 	ColorVariations       []ColorVariation `l10n:"sync"`
 	ColorVariationsSorter sorting.SortableCollection
 	Enabled               bool
+	ProductProperties     ProductProperties `sql:"type:text"`
 }
 
 func (product Product) DefaultPath() string {
@@ -98,6 +73,78 @@ func (product Product) Validate(db *gorm.DB) {
 	if strings.TrimSpace(product.Code) == "" {
 		db.AddError(validations.NewError(product, "Code", "Code can not be empty"))
 	}
+}
+
+type ProductImage struct {
+	gorm.Model
+	Title        string
+	Color        Color
+	ColorID      uint
+	Category     Category
+	CategoryID   uint
+	SelectedType string
+	File         media_library.MediaLibraryStorage `sql:"size:4294967295;" media_library:"url:/system/{{class}}/{{primary_key}}/{{column}}.{{extension}}"`
+}
+
+func (productImage ProductImage) Validate(db *gorm.DB) {
+	if strings.TrimSpace(productImage.Title) == "" {
+		db.AddError(validations.NewError(productImage, "Title", "Tile can not be empty"))
+	}
+}
+
+func (productImage *ProductImage) SetSelectedType(typ string) {
+	productImage.SelectedType = typ
+}
+
+func (productImage *ProductImage) GetSelectedType() string {
+	return productImage.SelectedType
+}
+
+func (productImage *ProductImage) ScanMediaOptions(mediaOption media_library.MediaOption) error {
+	if bytes, err := json.Marshal(mediaOption); err == nil {
+		return productImage.File.Scan(bytes)
+	} else {
+		return err
+	}
+}
+
+func (productImage *ProductImage) GetMediaOption() (mediaOption media_library.MediaOption) {
+	mediaOption.Video = productImage.File.Video
+	mediaOption.FileName = productImage.File.FileName
+	mediaOption.URL = productImage.File.URL()
+	mediaOption.OriginalURL = productImage.File.URL("original")
+	mediaOption.CropOptions = productImage.File.CropOptions
+	mediaOption.Sizes = productImage.File.GetSizes()
+	mediaOption.Description = productImage.File.Description
+	return
+}
+
+type ProductProperties []ProductProperty
+
+type ProductProperty struct {
+	Name  string
+	Value string
+}
+
+func (productProperties *ProductProperties) Scan(value interface{}) error {
+	switch v := value.(type) {
+	case []byte:
+		return json.Unmarshal(v, productProperties)
+	case string:
+		if v != "" {
+			return productProperties.Scan([]byte(v))
+		}
+	default:
+		return errors.New("not supported")
+	}
+	return nil
+}
+
+func (productProperties ProductProperties) Value() (driver.Value, error) {
+	if len(productProperties) == 0 {
+		return nil, nil
+	}
+	return json.Marshal(productProperties)
 }
 
 type ColorVariation struct {

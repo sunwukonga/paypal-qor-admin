@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
-	//	"strings"
+	"strings"
 
 	"github.com/gorilla/csrf"
 	"github.com/qor/qor/utils"
@@ -24,15 +24,17 @@ func main() {
 	api.API.MountTo("/api", mux)
 	admin.Filebox.MountTo("/downloads", mux)
 
-	for _, path := range []string{"system", "javascripts", "stylesheets", "images"} {
-		mux.Handle(fmt.Sprintf("/%s/", path), utils.FileServer(http.Dir("public")))
+	/*
+		for _, path := range []string{"system", "javascripts", "stylesheets", "images"} {
+			mux.Handle(fmt.Sprintf("/%s/", path), utils.FileServer(http.Dir("public")))
+		}
+	*/
+	for _, path := range []string{"system", "javascripts", "stylesheets"} {
+		publicDir := http.Dir(strings.Join([]string{config.Root, "public"}, "/"))
+		mux.Handle(fmt.Sprintf("/%s/", path), utils.FileServer(publicDir))
 	}
 
-	/*	for _, path := range []string{"system", "javascripts", "stylesheets"} {
-		publicDir := http.Dir(strings.Join([]string{config.Root, "public"}, "/"))
-		mux.Handle(fmt.Sprintf("/%s/", path), http.FileServer(publicDir))
-	} */
-
+	fmt.Printf("Root dir: %v\n", strings.Join([]string{config.Root, "public"}, "/"))
 	fmt.Printf("Listening on: %v\n", config.Config.Port)
 
 	skipCheck := func(h http.Handler) http.Handler {

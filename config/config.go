@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"html/template"
 	"os"
+	"time"
 
 	"github.com/jinzhu/configor"
 	"github.com/microcosm-cc/bluemonday"
@@ -31,8 +32,9 @@ var Config = struct {
 }{}
 
 var (
-	Root = os.Getenv("GOPATH") + "/src/github.com/sunwukonga/paypal-qor-admin"
-	View *render.Render
+	Root   = os.Getenv("GOPATH") + "/src/github.com/sunwukonga/paypal-qor-admin"
+	SGT, _ = time.LoadLocation("Asia/Singapore")
+	View   *render.Render
 )
 
 func init() {

@@ -273,7 +273,7 @@ func init() {
 	})
 
 	// Add Order
-	order := Admin.AddResource(&models.Order{}, &admin.Config{Menu: []string{"Order Management"}})
+	order := Admin.AddResource(&models.Order{}, &admin.Config{Menu: []string{"Order Management"}, Permission: roles.Deny(roles.CRUD, "servicer")})
 	order.Meta(&admin.Meta{Name: "ShippingAddress", Type: "single_edit"})
 	order.Meta(&admin.Meta{Name: "BillingAddress", Type: "single_edit"})
 	order.Meta(&admin.Meta{Name: "ShippedAt", Type: "date"})
@@ -389,7 +389,7 @@ func init() {
 	activity.Register(order)
 
 	// Define another resource for same model
-	abandonedOrder := Admin.AddResource(&models.Order{}, &admin.Config{Name: "Abandoned Order", Menu: []string{"Order Management"}})
+	abandonedOrder := Admin.AddResource(&models.Order{}, &admin.Config{Name: "Abandoned Order", Menu: []string{"Order Management"}, Permission: roles.Deny(roles.CRUD, "servicer")})
 	abandonedOrder.Meta(&admin.Meta{Name: "ShippingAddress", Type: "single_edit"})
 	abandonedOrder.Meta(&admin.Meta{Name: "BillingAddress", Type: "single_edit"})
 
@@ -436,15 +436,59 @@ func init() {
 		Type:  "readonly",
 	})
 	payments.Meta(&admin.Meta{
+		Name:  "McCurrency",
+		Label: "Currency",
+		Type:  "readonly",
+	})
+	payments.Meta(&admin.Meta{
+		Name:  "McFee",
+		Label: "Paypal Fee",
+		Type:  "readonly",
+	})
+	payments.Meta(&admin.Meta{
+		Name:  "McGross",
+		Label: "Gross",
+		Type:  "readonly",
+	})
+	payments.Meta(&admin.Meta{
+		Name:  "NetPayment",
+		Label: "Net Payment",
+		Type:  "readonly",
+		Valuer: func(record interface{}, context *qor.Context) interface{} {
+			txn := record.(*models.PaypalPayment)
+			return txn.Net()
+		},
+	})
+	payments.Meta(&admin.Meta{
 		Name:  "PaymentStatus",
 		Label: "Status",
 		Type:  "readonly",
 	})
 
-	payments.IndexAttrs("SubscrID", "UserID", "InfluencerID", "PaymentStatus")
-	payments.NewAttrs()
-	payments.EditAttrs()
-	payments.ShowAttrs(payments.IndexAttrs())
+	payments.IndexAttrs("SubscrID", "UserID", "InfluencerID", "McCurrency", "NetPayment", "PaymentStatus")
+	payments.NewAttrs("PaymentStatus")
+	payments.EditAttrs("PaymentStatus")
+	payments.ShowAttrs(
+		&admin.Section{
+			Title: "Payment",
+			Rows: [][]string{
+				{"TxnID", "PaymentStatus"},
+			},
+		},
+		&admin.Section{
+			Title: "Users",
+			Rows: [][]string{
+				{"UserID", "InfluencerID"},
+			},
+		},
+		&admin.Section{
+			Title: "Details",
+			Rows: [][]string{
+				{"McCurrency", "McGross", "McFee", "NetPayment"},
+				{},
+			},
+		},
+	)
 
 	// Add Beauty Box Subscriptions
 	subscriptions := Admin.AddResource(&models.Subscription{}, &admin.Config{Name: "Subscriptions", Menu: []string{"Beauty Box"}})
@@ -523,13 +567,15 @@ func init() {
 		Label: "Status",
 		Type:  "readonly",
 	})
-	associatedTransactions.Meta(&admin.Meta{
-		Name: "McFee",
-		Type: "hidden",
+	payments.Meta(&admin.Meta{
+		Name:  "McCurrency",
+		Label: "Currency",
+		Type:  "readonly",
 	})
 	associatedTransactions.Meta(&admin.Meta{
-		Name: "McGross",
-		Type: "hidden",
+		Name:  "McFee",
+		Label: "Paypal Fee",
+		Type:  "readonly",
 	})
 	associatedTransactions.Meta(&admin.Meta{
 		Name: "User",
@@ -541,9 +587,10 @@ func init() {
 	})
 	associatedTransactions.ShowAttrs(
 		&admin.Section{
-			Title: "",
+			Title: "Payment",
 			Rows: [][]string{
-				{"TxnID", "NetPayment", "PaymentStatus"},
+				{"TxnID", "PaymentStatus"},
+				{"McCurrency", "NetPayment"},
 			},
 		},
 	)
@@ -759,7 +806,7 @@ func init() {
 	user.EditAttrs(user.NewAttrs())
 
 	// Add Store
-	store := Admin.AddResource(&models.Store{}, &admin.Config{Menu: []string{"Store Management"}})
+	store := Admin.AddResource(&models.Store{}, &admin.Config{Menu: []string{"Store Management"}, Permission: roles.Deny(roles.CRUD, "servicer")})
 	store.Meta(&admin.Meta{Name: "Owner", Type: "single_edit"})
 	store.AddValidator(func(record interface{}, metaValues *resource.MetaValues, context *qor.Context) error {
 		if meta := metaValues.Get("Name"); meta != nil {
@@ -771,24 +818,24 @@ func init() {
 	})
 
 	// Add Translations
-	Admin.AddResource(i18n.I18n, &admin.Config{Menu: []string{"Site Management"}, Priority: 1})
+	Admin.AddResource(i18n.I18n, &admin.Config{Menu: []string{"Site Management"}, Permission: roles.Deny(roles.CRUD, "servicer"), Priority: 1})
 
 	// Add SEOSetting
-	Admin.AddResource(&models.SEOSetting{}, &admin.Config{Menu: []string{"Site Management"}, Singleton: true, Priority: 2})
+	Admin.AddResource(&models.SEOSetting{}, &admin.Config{Menu: []string{"Site Management"}, Permission: roles.Deny(roles.CRUD, "servicer"), Singleton: true, Priority: 2})
 
 	// Add Worker
 	Worker := getWorker()
-	Admin.AddResource(Worker, &admin.Config{Menu: []string{"Site Management"}})
+	Admin.AddResource(Worker, &admin.Config{Menu: []string{"Site Management"}, Permission: roles.Deny(roles.CRUD, "servicer")})
 
 	db.Publish.SetWorker(Worker)
 	exchange_actions.RegisterExchangeJobs(i18n.I18n, Worker)
 
 	// Add Publish
-	Admin.AddResource(db.Publish, &admin.Config{Menu: []string{"Site Management"}, Singleton: true})
+	Admin.AddResource(db.Publish, &admin.Config{Menu: []string{"Site Management"}, Permission: roles.Deny(roles.CRUD, "servicer"), Singleton: true})
 	publish.RegisterL10nForPublish(db.Publish, Admin)
 
 	// Add Setting
-	Admin.AddResource(&models.Setting{}, &admin.Config{Name: "Shop Setting", Singleton: true})
+	Admin.AddResource(&models.Setting{}, &admin.Config{Name: "Shop Setting", Permission: roles.Deny(roles.CRUD, "servicer"), Singleton: true})
 
 	// Add Search Center Resources
 	Admin.AddSearchResource(product, user, order)

@@ -10,11 +10,12 @@ import (
 	"github.com/qor/l10n"
 	"github.com/qor/media_library"
 	"github.com/qor/qor"
-	"github.com/sunwukonga/paypal-qor-admin/app/models"
-	"github.com/sunwukonga/paypal-qor-admin/db"
 	"github.com/qor/qor/resource"
+	"github.com/qor/roles"
 	"github.com/qor/sorting"
 	"github.com/qor/widget"
+	"github.com/sunwukonga/paypal-qor-admin/app/models"
+	"github.com/sunwukonga/paypal-qor-admin/db"
 )
 
 var Widgets *widget.Widgets
@@ -29,7 +30,7 @@ type QorWidgetSetting struct {
 func initWidgets() {
 	if Widgets == nil {
 		Widgets = widget.New(&widget.Config{DB: db.DB})
-		Widgets.WidgetSettingResource = Admin.AddResource(&QorWidgetSetting{}, &admin.Config{Menu: []string{"Site Management"}, Priority: 3})
+		Widgets.WidgetSettingResource = Admin.AddResource(&QorWidgetSetting{}, &admin.Config{Menu: []string{"Site Management"}, Permission: roles.Deny(roles.CRUD, "servicer"), Priority: 3})
 		Widgets.WidgetSettingResource.Meta(&admin.Meta{Name: "Name", FormattedValuer: func(widget interface{}, ctx *qor.Context) interface{} {
 			setting := widget.(*QorWidgetSetting)
 			return template.HTML(`<img src="/images/Widget-` + setting.WidgetType + `.png" width="80" height="35" style="margin-right: 12px;"/><span>` + setting.Name + `</span>`)

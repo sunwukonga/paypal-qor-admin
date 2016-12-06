@@ -109,7 +109,6 @@ func init() {
 	assetManager := Admin.AddResource(&media_library.AssetManager{}, &admin.Config{Invisible: true})
 
 	//* Produc Management *//
-	Admin.AddMenu(&admin.Menu{Name: "Product Management", Link: "/productmanagement", Ancestors: []string{"Dashboard"}, Permission: roles.Deny(roles.CRUD, "servicer")})
 	color := Admin.AddResource(&models.Color{}, &admin.Config{Menu: []string{"Product Management"}, Permission: roles.Deny(roles.CRUD, "servicer"), Priority: -5})
 	Admin.AddResource(&models.Size{}, &admin.Config{Menu: []string{"Product Management"}, Permission: roles.Deny(roles.CRUD, "servicer"), Priority: -4})
 
@@ -472,7 +471,7 @@ func init() {
 	subscriptions.Meta(&admin.Meta{
 		Name:  "SubscrDate",
 		Label: "Signup Date",
-		Type:  "readonly",
+		Type:  "date",
 	})
 	subscriptions.Meta(&admin.Meta{
 		Name:  "RecurTimes",
@@ -480,19 +479,19 @@ func init() {
 		Type:  "readonly",
 	})
 	subscriptions.Meta(&admin.Meta{
-		Name:  "State",
+		Name:  "PaymentStatus",
 		Label: "Status",
 		Type:  "readonly",
 	})
 	subscriptions.Meta(&admin.Meta{
 		Name:  "CancelledAt",
 		Label: "Cancel Date",
-		Type:  "readonly",
+		Type:  "date",
 	})
 	subscriptions.Meta(&admin.Meta{
 		Name:  "EotAt",
 		Label: "End Date",
-		Type:  "readonly",
+		Type:  "date",
 	})
 	associatedTransactions := subscriptions.Meta(&admin.Meta{
 		Name:  "SubscrPayments",
@@ -515,6 +514,16 @@ func init() {
 		},
 	})
 	associatedTransactions.Meta(&admin.Meta{
+		Name:  "TxnID",
+		Label: "ID",
+		Type:  "readonly",
+	})
+	associatedTransactions.Meta(&admin.Meta{
+		Name:  "PaymentStatus",
+		Label: "Status",
+		Type:  "readonly",
+	})
+	associatedTransactions.Meta(&admin.Meta{
 		Name: "McFee",
 		Type: "hidden",
 	})
@@ -532,14 +541,14 @@ func init() {
 	})
 	associatedTransactions.ShowAttrs(
 		&admin.Section{
-			Title: "Tranx",
+			Title: "",
 			Rows: [][]string{
-				{"ID", "NetPayment", "Status"},
+				{"TxnID", "NetPayment", "PaymentStatus"},
 			},
 		},
 	)
-	associatedTransactions.EditAttrs(associatedTransactions.ShowAttrs)
-	associatedTransactions.IndexAttrs(associatedTransactions.ShowAttrs)
+	associatedTransactions.EditAttrs(associatedTransactions.ShowAttrs())
+	associatedTransactions.IndexAttrs(associatedTransactions.ShowAttrs())
 
 	/*	associatedTransactions.Meta(&admin.Meta{
 			Name:  "TxnID",

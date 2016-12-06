@@ -26,6 +26,7 @@ import (
 	"github.com/qor/qor"
 	"github.com/qor/qor/resource"
 	"github.com/qor/qor/utils"
+	"github.com/qor/roles"
 	"github.com/qor/transition"
 	"github.com/qor/validations"
 	"github.com/sunwukonga/paypal-qor-admin/app/models"
@@ -108,16 +109,17 @@ func init() {
 	assetManager := Admin.AddResource(&media_library.AssetManager{}, &admin.Config{Invisible: true})
 
 	//* Produc Management *//
-	color := Admin.AddResource(&models.Color{}, &admin.Config{Menu: []string{"Product Management"}, Priority: -5})
-	Admin.AddResource(&models.Size{}, &admin.Config{Menu: []string{"Product Management"}, Priority: -4})
+	Admin.AddMenu(&admin.Menu{Name: "Product Management", Link: "/productmanagement", Ancestors: []string{"Dashboard"}, Permission: roles.Deny(roles.CRUD, "servicer")})
+	color := Admin.AddResource(&models.Color{}, &admin.Config{Menu: []string{"Product Management"}, Permission: roles.Deny(roles.CRUD, "servicer"), Priority: -5})
+	Admin.AddResource(&models.Size{}, &admin.Config{Menu: []string{"Product Management"}, Permission: roles.Deny(roles.CRUD, "servicer"), Priority: -4})
 
-	category := Admin.AddResource(&models.Category{}, &admin.Config{Menu: []string{"Product Management"}, Priority: -3})
+	category := Admin.AddResource(&models.Category{}, &admin.Config{Menu: []string{"Product Management"}, Permission: roles.Deny(roles.CRUD, "servicer"), Priority: -3})
 	category.Meta(&admin.Meta{Name: "Categories", Type: "select_many"})
 
-	collection := Admin.AddResource(&models.Collection{}, &admin.Config{Menu: []string{"Product Management"}, Priority: -2})
+	collection := Admin.AddResource(&models.Collection{}, &admin.Config{Menu: []string{"Product Management"}, Permission: roles.Deny(roles.CRUD, "servicer"), Priority: -2})
 
 	// Add ProductImage as Media Libraray
-	ProductImagesResource := Admin.AddResource(&models.ProductImage{}, &admin.Config{Menu: []string{"Product Management"}, Priority: -1})
+	ProductImagesResource := Admin.AddResource(&models.ProductImage{}, &admin.Config{Menu: []string{"Product Management"}, Permission: roles.Deny(roles.CRUD, "servicer"), Priority: -1})
 
 	ProductImagesResource.Filter(&admin.Filter{
 		Name:   "SelectedType",
@@ -135,7 +137,7 @@ func init() {
 	ProductImagesResource.IndexAttrs("File", "Title")
 
 	// Add Product
-	product := Admin.AddResource(&models.Product{}, &admin.Config{Menu: []string{"Product Management"}})
+	product := Admin.AddResource(&models.Product{}, &admin.Config{Menu: []string{"Product Management"}, Permission: roles.Deny(roles.CRUD, "servicer")})
 	product.Meta(&admin.Meta{Name: "MadeCountry", Config: &admin.SelectOneConfig{Collection: Countries}})
 	product.Meta(&admin.Meta{Name: "Description", Config: &admin.RichEditorConfig{AssetManager: assetManager, Plugins: []admin.RedactorPlugin{
 		{Name: "medialibrary", Source: "/admin/assets/javascripts/qor_redactor_medialibrary.js"},

@@ -6,6 +6,7 @@ import (
 
 	"github.com/jinzhu/gorm"
 	"github.com/qor/transition"
+	"github.com/sunwukonga/paypal-qor-admin/config"
 	//	"github.com/sunwukonga/paypal-qor-admin/app/models"
 )
 
@@ -16,15 +17,16 @@ type Subscription struct {
 	InfluencerID uint
 	Influencer   User `gorm:"save_associations:false"`
 
-	SubscrPayments []PaypalPayment `gorm:"foreignkey:SubscrID"`
+	//SubscrPayments []PaypalPayment `gorm:"foreignkey:SubscrID;AssociationForeignKey:SubscrID"`
+	SubscrPayments []PaypalPayment `gorm:"ForeignKey:SubscrID"`
 
 	SubscrID   string
 	RecurTimes int
 	Period     string
-	SubscrDate string
+	SubscrDate time.Time
 
-	CancelledAt *time.Time
-	EotAt       *time.Time
+	CancelledAt time.Time
+	EotAt       time.Time
 	transition.Transition
 }
 
@@ -37,6 +39,7 @@ type PaypalPayment struct {
 
 	TxnID         string
 	SubscrID      string
+	McCurrency    string
 	McGross       float32
 	McFee         float32
 	PaymentStatus string
@@ -130,34 +133,25 @@ var (
 )
 
 func init() {
-	// Define Order's States
+	// Define Subscription's States
 	SubscriptionState.Initial("draft")
 	SubscriptionState.State("active")
 	SubscriptionState.State("cancelled").Enter(func(value interface{}, tx *gorm.DB) error {
-		tx.Model(value).UpdateColumn("cancelled_at", time.Now())
+		tx.Model(value).UpdateColumn("cancelled_at", time.Now().In(config.SGT))
 		return nil
 	})
-	SubscriptionState.State("unpaid").Enter(func(value interface{}, tx *gorm.DB) error {
-		// This requires no action that I yet know of. We are waiting for the customer to resolve his or her payment difficulties.
-		return nil
-	})
-	SubscriptionState.State("eot").Enter(func(value interface{}, tx *gorm.DB) error {
-		// Perhaps we would require some clean up here?
-		return nil
-	})
+	SubscriptionState.State("unpaid")
+	SubscriptionState.State("eot")
 
+	// Define Subscription's Events
 	SubscriptionState.Event("signup").To("active").From("draft")
 
 	paymentEvent := SubscriptionState.Event("payment")
 	paymentEvent.To("active").From("active")
 	paymentEvent.To("active").From("unpaid")
 
-	SubscriptionState.Event("cancel").To("cancelled").From("active", "unpaid")
+	SubscriptionState.Event("cancel").To("cancelled").From("active") // Don't include `From("unpaid")`, as I don't want to lose that info.
 	SubscriptionState.Event("fail").To("unpaid").From("active", "unpaid")
-
-	eotEvent := SubscriptionState.Event("eot")
-	eotEvent.To("eot").From("active")
-	eotEvent.To("eot").From("unpaid")
-	eotEvent.To("eot").From("cancelled")
+	SubscriptionState.Event("eot").To("eot").From("active", "unpaid", "cancelled")
 
 }

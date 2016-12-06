@@ -10,9 +10,17 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sunwukonga/paypal-qor-admin/app/models"
+	"github.com/sunwukonga/paypal-qor-admin/config"
+)
+
+const (
+	// This is a format string used by `time` package to extract meaningful information about the format.
+	PaypalTimeFmt string = "15:04:05 Jan 02, 2006 MST"
 )
 
 func IpnReceiver(ctx *gin.Context) {
@@ -73,6 +81,24 @@ func IpnReceiver(ctx *gin.Context) {
 		fmt.Println(i, v)
 	}
 
+	// Test for "test_ipn"
+	if _, keyExists := values["test_ipn"]; keyExists {
+		// We have received a testing IPN from Paypal
+		if isProduction {
+			log.Printf("WARNING: We have received a TEST IPN from paypal in Production Mode, ignoring!")
+			return
+		} else {
+			// Carry on, TEST IPN received into testing environment.
+		}
+	} else {
+		// We have received a Live IPN from Paypal {
+		if isProduction {
+			// Carry on, Live IPN received in Production Mode.
+		} else {
+			log.Printf("WARNING: We have received a LIVE IPN from paypal in Development Mode!")
+			// Continue, but this could get messy!
+		}
+	}
 	// Grab custom data
 	custom := map[string]string{}
 	if err := json.Unmarshal([]byte(values["custom"][0]), &custom); err != nil {
@@ -87,6 +113,7 @@ func IpnReceiver(ctx *gin.Context) {
 		}
 	}
 
+	//if _, keyExists := values["txn_type"]; keyExists {
 	if len(values["txn_type"]) > 0 {
 		switch values["txn_type"][0] {
 		case "subscr_signup":
@@ -116,8 +143,28 @@ func IpnReceiver(ctx *gin.Context) {
 				subscription.SubscrID = values["subscr_id"][0]
 				recurTimes, _ := strconv.Atoi(values["recur_times"][0])
 				subscription.RecurTimes = recurTimes
+
+				subDate, _ := time.Parse(PaypalTimeFmt, values["subscr_date"][0])
+				//subDateSGT := subDate.In(config.SGT)
+				subscription.SubscrDate = subDate.In(config.SGT)
+
 				subscription.Period = values["period3"][0]
-				subscription.SubscrDate = values["subscr_date"][0]
+				periodStrings := strings.Split(subscription.Period, " ")
+				periodFactor, _ := strconv.Atoi(periodStrings[0])
+
+				eotAt := time.Now().In(config.SGT)
+				switch periodStrings[1] {
+				case "D":
+					eotAt = subDate.AddDate(0, 0, periodFactor*recurTimes)
+				case "W":
+					eotAt = subDate.AddDate(0, 0, periodFactor*7*recurTimes)
+				case "M":
+					eotAt = subDate.AddDate(0, periodFactor*recurTimes, 0)
+				case "Y":
+					eotAt = subDate.AddDate(periodFactor*recurTimes, 0, 0)
+				}
+				subscription.EotAt = eotAt
+
 				DB(ctx).Create(subscription)
 			}
 
@@ -154,6 +201,7 @@ func IpnReceiver(ctx *gin.Context) {
 						paypalPayment.McGross = float32(gross)
 						fee, _ := strconv.ParseFloat(values["mc_fee"][0], 32)
 						paypalPayment.McFee = float32(fee)
+						paypalPayment.McCurrency = values["mc_currency"][0]
 						paypalPayment.PaymentStatus = values["payment_status"][0]
 						DB(ctx).Create(paypalPayment)
 						if len(subscription.SubscrID) > 0 {
@@ -166,9 +214,11 @@ func IpnReceiver(ctx *gin.Context) {
 						// information in favour of a paypal note for now.
 					} else {
 						//Error: We have nothing to identify the payment with.
+						log.Printf("WARNING(IpnReceiver): Payment had no `payer_id`!")
 					}
 				} else {
 					// Log any payment_status that mean we haven't been paid.
+					log.Printf("WARNING(IpnReceiver): We received a `payment_status` of %v", values["payment_status"][0])
 				}
 				// Ignore this as it means paypal sent con-conforming data.
 			}
@@ -176,16 +226,19 @@ func IpnReceiver(ctx *gin.Context) {
 			// Record a cancel event against the Subscription. Wait for subscr_eot...
 			//Get the referred to Subscription.
 			if len(subscription.SubscrID) > 0 {
+
 				models.SubscriptionState.Trigger("cancel", subscription, DB(ctx))
 			} else {
 				// Log attempt to cancel a subscription without reference to "subscr_id"
+				log.Printf("WARNING(IpnReceiver): Subscription cancel sent that doesn't match a Subscription")
 			}
 		case "subscr_failed":
 			// Enter "unpaid" state
 			if len(subscription.SubscrID) > 0 {
 				models.SubscriptionState.Trigger("fail", subscription, DB(ctx))
 			} else {
-				// Log attempt to cancel a subscription without reference to "subscr_id"
+				log.Printf("WARNING(IpnReceiver): Subscription failed sent that doesn't match a Subscription")
+				// Log attempt to register an unpaid event without reference to "subscr_id"
 			}
 		case "subscr_eot":
 			// Enter "eot" (end of term) state
@@ -193,9 +246,11 @@ func IpnReceiver(ctx *gin.Context) {
 				models.SubscriptionState.Trigger("eot", subscription, DB(ctx))
 			} else {
 				// Log attempt to end a subscription without reference to "subscr_id"
+				log.Printf("WARNING(IpnReceiver): Subscription eot sent that doesn't match a Subscription")
 			}
 		case "subscr_modify":
 			// We are not expecting this. Log the occurance.
+			log.Printf("WARNING(IpnReceiver): Subscription modify sent, but we don't accept them")
 		} // End switch
 	} // End test for txn_type
 } // End func

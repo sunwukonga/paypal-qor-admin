@@ -24,6 +24,8 @@ var Config = struct {
 	Host string `default:"172.31.19.190" env:"HOST"`
 	DB   struct {
 		Name     string `default:"qor_example"`
+		Host     string `default:"localhost"`
+		Port     string `default:"3306"`
 		Adapter  string `default:"mysql"`
 		User     string
 		Password string

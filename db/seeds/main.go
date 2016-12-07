@@ -31,6 +31,8 @@ import (
 	"github.com/sunwukonga/paypal-qor-admin/db"
 )
 
+/* Added myself as admin, and commented out most of the calls to the populating steps */
+
 /* How to run this script
    $ go run db/seeds/main.go db/seeds/seeds.go
 */
@@ -75,32 +77,32 @@ func createRecords() {
 	createSetting()
 	fmt.Println("--> Created setting.")
 
-	createSeo()
-	fmt.Println("--> Created seo.")
+	//createSeo()
+	//fmt.Println("--> Created seo.")
 
 	createAdminUsers()
 	fmt.Println("--> Created admin users.")
 
-	createUsers()
-	fmt.Println("--> Created users.")
-	createAddresses()
-	fmt.Println("--> Created addresses.")
+	//createUsers()
+	//fmt.Println("--> Created users.")
+	//createAddresses()
+	//fmt.Println("--> Created addresses.")
 
-	createCategories()
-	fmt.Println("--> Created categories.")
-	createCollections()
-	fmt.Println("--> Created collections.")
-	createColors()
-	fmt.Println("--> Created colors.")
-	createSizes()
-	fmt.Println("--> Created sizes.")
-	createProducts()
-	fmt.Println("--> Created products.")
-	createStores()
-	fmt.Println("--> Created stores.")
+	//createCategories()
+	//fmt.Println("--> Created categories.")
+	//createCollections()
+	//fmt.Println("--> Created collections.")
+	//createColors()
+	//fmt.Println("--> Created colors.")
+	//createSizes()
+	//fmt.Println("--> Created sizes.")
+	//createProducts()
+	//fmt.Println("--> Created products.")
+	//createStores()
+	//fmt.Println("--> Created stores.")
 
-	createOrders()
-	fmt.Println("--> Created orders.")
+	//createOrders()
+	//fmt.Println("--> Created orders.")
 
 	createWidgets()
 	fmt.Println("--> Created widgets.")
@@ -142,7 +144,7 @@ func createSeo() {
 
 func createAdminUsers() {
 	AdminUser = &models.User{}
-	AdminUser.Email = "dev@getqor.com"
+	AdminUser.Email = "pauldesmondparker@gmail.com"
 	AdminUser.Password = "$2a$10$a8AXd1q6J1lL.JQZfzXUY.pznG1tms8o.PK.tYD.Tkdfc3q7UrNX." // Password: testing
 	AdminUser.Confirmed = true
 	AdminUser.Name.Scan("QOR Admin")
@@ -153,8 +155,8 @@ func createAdminUsers() {
 	Notification.Send(&notification.Message{
 		From:        AdminUser,
 		To:          AdminUser,
-		Title:       "Welcome To QOR Admin",
-		Body:        "Welcome To QOR Admin",
+		Title:       "Welcome To SC BEAUTY BOX Backend",
+		Body:        "Welcome To SC BEAUTY BOX Backend",
 		MessageType: "info",
 	}, &qor.Context{DB: db.DB})
 }

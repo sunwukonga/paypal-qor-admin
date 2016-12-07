@@ -32,7 +32,7 @@ func IpnReceiver(ctx *gin.Context) {
 	)
 
 	// Switch for production and live
-	isProduction := false
+	isProduction := true
 
 	urlSimulator := "https://www.sandbox.paypal.com/cgi-bin/webscr"
 	urlLive := "https://www.paypal.com/cgi-bin/webscr"

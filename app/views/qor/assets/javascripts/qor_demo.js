@@ -1,19 +1,19 @@
-var OrderChart,UsersChart;
-function RenderChart(ordersData, usersData) {
+var TranxChart,UsersChart;
+function RenderChart(tranxData, usersData) {
     Chart.defaults.global.responsive = true;
 
-    var orderDateLables = [];
-    var orderCounts = [];
-    for (var i = 0; i < ordersData.length; i++) {
-        orderDateLables.push(ordersData[i].Date.substring(5,10));
-        orderCounts.push(ordersData[i].Total)
+    var tranxDateLables = [];
+    var tranxCounts = [];
+    for (var i = 0; i < tranxData.length; i++) {
+        tranxDateLables.push(tranxData[i].Date.substring(5,10));
+        tranxCounts.push(tranxData[i].Total)
     }
-    if(OrderChart){
-        OrderChart.destroy();
+    if(TranxChart){
+        TranxChart.destroy();
     }
-    var orders_context = document.getElementById("orders_report").getContext("2d");
-    var orders_data = ChartData(orderDateLables,orderCounts);
-    OrderChart = new Chart(orders_context).Line(orders_data, "");
+    var tranx_context = document.getElementById("trans_report").getContext("2d");
+    var tranx_data = ChartData(tranxDateLables,tranxCounts);
+    TranxChart = new Chart(tranx_context).Line(tranx_data, "");
 
     var usersDateLables = [];
     var usersCounts = [];
@@ -79,7 +79,7 @@ $(document).ready(function() {
   $("#endDate").val(yesterday.Format("yyyy-MM-dd"));
   $(".j-update-record").click(function(){
     $.getJSON("/admin/reports",{startDate:$("#startDate").val(), endDate:$("#endDate").val()},function(jsonData){
-      RenderChart(jsonData.Orders,jsonData.Users);
+      RenderChart(jsonData.Tranx,jsonData.Users);
     });
   });
   $(".j-update-record").click();

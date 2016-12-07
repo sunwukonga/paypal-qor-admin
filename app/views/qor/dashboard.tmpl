@@ -1,19 +1,15 @@
-<p>/home/vagrant/code/go/src/github.com/sunwukonga/paypal-qor-admin/app/views/qor/dashboard.tmpl</p>
 <div class="qor-page__body">
   <div class="qor-section introduction">
-    <h5>This is the DEMO app for Qor</h5>
-    Github: <a href="http://github.com/qor/qor" target="_blank">github.com/qor/qor</a><br/>
-    WebSite: <a href="http://getqor.com" target="_blank">getqor.com</a><br/>
-    Source code of this demo: <a href="http://github.com/sunwukonga/paypal-qor-admin" target="_blank">github.com/sunwukonga/paypal-qor-admin</a><br/>
+    <h5>This is the SC BEAUTY BOX backend</h5>
   </div>
 
   <!-- if have table please add qor-section__table className -->
   <div class="qor-section qor-section__table">
     <div class="qor-section__header">
-      <h4 class="qor-section-title">{{t "Latest Orders"}}</h4>
+      <h4 class="qor-section-title">{{t "Latest Transactions"}}</h4>
     </div>
     <div class="qor-section__body qor-table-container">
-      {{render_latest_order .}}
+      {{render_latest_tranx .}}
     </div>
   </div>
 
@@ -42,13 +38,12 @@
     <script src="/javascripts/Chart.min.js"></script>
     <div class="mdl-grid">
       <div class="mdl-cell mdl-cell--6-col">
-        <h4 class="qor-section-title">{{t "Paid Orders Count"}}</h4>
-        <canvas id="orders_report"></canvas>
-      </div>
-
-      <div class="mdl-cell mdl-cell--6-col">
         <h4 class="qor-section-title">{{t "Registered Users Count"}}</h4>
         <canvas id="users_report"></canvas>
+      </div>
+      <div class="mdl-cell mdl-cell--6-col">
+        <h4 class="qor-section-title">{{t "Transaction Report"}}</h4>
+        <canvas id="trans_report"></canvas>
       </div>
     </div>
   </div>

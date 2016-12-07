@@ -2,14 +2,15 @@ package admin
 
 import (
 	"encoding/json"
+	"fmt"
 
-	"github.com/sunwukonga/paypal-qor-admin/app/models"
 	"github.com/qor/admin"
+	"github.com/sunwukonga/paypal-qor-admin/app/models"
 )
 
 type Charts struct {
-	Orders []models.Chart
-	Users  []models.Chart
+	Tranx []models.Chart
+	Users []models.Chart
 }
 
 func ReportsDataHandler(context *admin.Context) {
@@ -17,10 +18,13 @@ func ReportsDataHandler(context *admin.Context) {
 	startDate := context.Request.URL.Query().Get("startDate")
 	endDate := context.Request.URL.Query().Get("endDate")
 
-	charts.Orders = models.GetChartData("orders", startDate, endDate)
+	charts.Tranx = models.GetChartData("paypal_payments", startDate, endDate)
 	charts.Users = models.GetChartData("users", startDate, endDate)
 
 	b, _ := json.Marshal(charts)
+	for _, v := range charts.Tranx {
+		fmt.Println("Chart data: ", v.Total)
+	}
 	context.Writer.Write(b)
 	return
 }

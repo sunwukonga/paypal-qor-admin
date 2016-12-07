@@ -29,7 +29,10 @@ func Router() *http.ServeMux {
 		//		router.Use(log.Logger("application.log", 30))
 		gin.SetMode(gin.DebugMode)
 
-		router.GET("/", controllers.HomeIndex)
+		//router.GET("/", controllers.HomeIndex)
+		router.GET("/", func(c *gin.Context) {
+			c.Redirect(302, "/admin")
+		})
 		router.GET("/products/:code", controllers.ProductShow)
 		router.GET("/cart", controllers.CartShow)
 		router.GET("/switch_locale", controllers.SwitchLocale)

@@ -111,3 +111,221 @@ if (form.attachEvent) {
     alert(response);
   }
 </script>
+
+
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+<div id="buybox_container">
+    <div id="buybox_main_image">
+      <img style="padding:0;display: block;margin:0 auto;max-height:100%;max-width:100%;" src="http://j.b5z.net/i/u/10242520/i/subscription/SC_Banner.jpg">
+    </div>
+    <div id="buybox_image_left">
+		<form action="" id="check_coupon_six">
+		    <input type="text" id="coupon_input_six" name="couponSix" maxlength="6" pattern="[A-Z\d]*" />
+			<input type="image" src="http://j.b5z.net/i/u/10242520/i/subscription/IndonesiaPrice6Months.png" border="0" name="submit">
+		</form>
+    </div>
+    <div id="buybox_image_right">
+        <form action="" id="check_coupon_twelve">
+            <input type="text" id="coupon_input_twelve" name="couponTwelve" maxlength="6" pattern="[A-Z\d]*" />
+			<input type="image" src="http://j.b5z.net/i/u/10242520/i/subscription/IndonesiaPrice12Months.png" border="0" name="submit">
+		</form>
+    </div>
+</div>
+
+<!--<form action="https://www.paypal.com/cgi-bin/webscr" id="payPalForm" method="post" target="_top"> -->
+<form action="https://www.sandbox.paypal.com/cgi-bin/webscr" id="payPalForm" method="post" target="_top">
+<!--        <input type="hidden" name="business" value="leza@scbeautynetwork.com"> -->
+            <input type="hidden" name="business" value="leza-facilitator@scbeautynetwork.com">
+            <input type="hidden" name="cmd" value="_xclick-subscriptions">
+            <input type="hidden" name="txn_type" value="subscr_signup">
+            <input type="hidden" name="notify_url" value="http://notify.parker.sg/notify/">
+            <input type="hidden" name="return" value="http://www.scbeautybox.com/">
+            <input type="hidden" name="cancel_return" value="http://www.scbeautybox.com/">
+            <input type="hidden" name="rm" value="2">
+            <!-- currency_code set by JS script below -->
+            <input type="hidden" name="currency_code" id="set_currency" value="SGD">
+            <input type="hidden" name="item_name" id="set_item_name" value="Reseller Registration Fee">
+            <input type="hidden" name="custom" id="set_custom" value="">
+            <input type="hidden" name="quantity" id="quantity" value="1">
+            <input type="hidden" name="a3" id="set_monthly_charge" type="hidden" value="30" />
+            <input type="hidden" name="p3" type="hidden" value="1" />
+            <input type="hidden" name="t3" type="hidden" value="M" />
+            <input type="hidden" name="src" type="hidden" value="1" />
+            <input type="hidden" name="srt" id="set_cycles" type="hidden" value="2" />
+            <input type="hidden" name="cbt" value="Return to SC BEAUTY BOX">
+</form>
+
+<script>
+
+  // Six should be the larger number.
+  // ********************************
+  var chargeSix = 35;
+  var chargeTwelve = 31;
+  var country = 'ID';
+  var currency = 'SGD';
+  // ********************************
+
+  document.getElementById('set_currency').value = currency;
+  document.getElementById('coupon_input_six').onkeyup = function(event) {
+	this.value = this.value.replace(/[^A-Z\d]/, '');
+  }
+  document.getElementById('coupon_input_twelve').onkeyup = function(event) {
+	this.value = this.value.replace(/[^A-Z\d]/, '');
+  }
+
+  var codeSix;
+  var codeTwelve;
+  var formSix = document.getElementById('check_coupon_six');
+  var formTwelve = document.getElementById('check_coupon_twelve');
+  if (formSix.attachEvent) {
+	formSix.attachEvent("submit", callWithSix);
+  } else {
+	formSix.addEventListener("submit", callWithSix);
+  }
+  if (formTwelve.attachEvent) {
+	formTwelve.attachEvent("submit", callWithTwelve);
+  } else {
+	formTwelve.addEventListener("submit", callWithTwelve);
+  }
+
+  var isIE8 = window.XDomainRequest ? true : false;
+  var url = 'http://notify.parker.sg/couponcode/';
+  var invocationSix = createCrossDomainRequest();
+  var invocationTwelve = createCrossDomainRequest();
+  function createCrossDomainRequest(url, handler) {
+    var request;
+    if (isIE8) {
+      request = new window.XDomainRequest();
+      }
+      else {
+        request = new XMLHttpRequest();
+      }
+    return request;
+  }
+
+// ----------------------
+// Six month functions
+// ----------------------
+  function callWithSix(e) {
+    if (e.preventDefault) e.preventDefault();
+    if 
+    codeSix = document.getElementById("coupon_input_six").value;
+    if (codeSix == "") {
+      // Post 6 month subscription to Paypal without coupon code.
+      document.getElementById('set_custom').value = '{"coupon": ""}';
+      document.getElementById('set_item_name').value = country + ' Beauty Box 6 months';
+      document.getElementById('set_monthly_charge').value = chargeSix;
+      document.getElementById('set_cycles').value = '6';
+      document.getElementById('payPalForm').submit();
+    } else {
+		if (invocationSix) {
+		  if(isIE8) {
+			invocationSix.onload = switchPaypalSix;
+			invocationSix.open("GET", url + codeSix, true);
+			invocationSix.send();
+		  }
+		  else {
+			invocationSix.open('GET', url + codeSix, true);
+			invocationSix.onreadystatechange = handlerSix;
+			invocationSix.send();
+		  }
+		}
+		else {
+		  alert("No Invocation Took Place At All");
+		}
+    }
+    // You must return false to prevent the default form behavior
+    return false;
+  }
+
+  function handlerSix(evtXHR) {
+    if (invocationSix.readyState == 4)
+    {
+      if (invocationSix.status == 200) {
+          switchPaypalSix();
+      }
+      else {
+        alert("Unable to verify code");
+      }
+    }
+  }
+
+  function switchPaypalSix() {
+    var response = invocationSix.responseText;
+    if (response == "true") {
+      // Post 6 month subscription to Paypal with coupon code.
+      document.getElementById('set_custom').value = '{"coupon": "' + codeSix + '"}';
+      document.getElementById('set_item_name').value = country + ' Beauty Box 6 months';
+      document.getElementById('set_monthly_charge').value = chargeSix;
+      document.getElementById('set_cycles').value = '6';
+      document.getElementById('payPalForm').submit();
+    } else {
+      alert("Invalid discount code. Please enter a valid code, or leave blank.");
+    }
+  }
+
+// ----------------------
+// Twelve month functions
+// ----------------------
+  function callWithTwelve(e) {
+    if (e.preventDefault) e.preventDefault();
+    if 
+    codeTwelve = document.getElementById("coupon_input_twelve").value;
+    if (codeTwelve == "") {
+      // Post 12 month subscription to Paypal without coupon code.
+      document.getElementById('set_custom').value = '{"coupon": ""}';
+      document.getElementById('set_item_name').value = country + ' Beauty Box 12 months';
+      document.getElementById('set_monthly_charge').value = chargeTwelve;
+      document.getElementById('set_cycles').value = '12';
+      document.getElementById('payPalForm').submit();
+    } else {
+		if (invocationTwelve) {
+		  if(isIE8) {
+			invocationTwelve.onload = switchPaypalTwelve;
+			invocationTwelve.open("GET", url + codeTwelve, true);
+			invocationTwelve.send();
+		  }
+		  else {
+			invocationTwelve.open('GET', url + codeTwelve, true);
+			invocationTwelve.onreadystatechange = handlerTwelve;
+			invocationTwelve.send();
+		  }
+		}
+		else {
+		  alert("No Invocation Took Place At All");
+		}
+    }
+    // You must return false to prevent the default form behavior
+    return false;
+  }
+
+  function handlerTwelve(evtXHR) {
+    if (invocationTwelve.readyState == 4)
+    {
+      if (invocationTwelve.status == 200) {
+          switchPaypalTwelve();
+      }
+      else {
+        alert("Unable to verify code");
+      }
+    }
+  }
+
+  function switchPaypalTwelve() {
+    var response = invocationTwelve.responseText;
+    if (response == "true") {
+      // Post 12 month subscription to Paypal with coupon code.
+      document.getElementById('set_custom').value = '{"coupon": "' + codeTwelve + '"}';
+      document.getElementById('set_item_name').value = country + ' Beauty Box 12 months';
+      document.getElementById('set_monthly_charge').value = chargeTwelve;
+      document.getElementById('set_cycles').value = '12';
+      document.getElementById('payPalForm').submit();
+    } else {
+      alert("Invalid discount code. Please enter a valid code, or leave blank.");
+    }
+  }
+</script>

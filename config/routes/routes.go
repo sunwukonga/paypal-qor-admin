@@ -27,7 +27,7 @@ func Router() *http.ServeMux {
 			}
 		})
 		//		router.Use(log.Logger("application.log", 30))
-		gin.SetMode(gin.DebugMode)
+		gin.SetMode(gin.ReleaseMode)
 
 		//router.GET("/", controllers.HomeIndex)
 		router.GET("/", func(c *gin.Context) {

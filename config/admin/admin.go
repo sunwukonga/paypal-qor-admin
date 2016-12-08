@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"html/template"
-	"math/rand"
 	"path"
 	"regexp"
 	"strconv"
@@ -34,19 +33,12 @@ import (
 	"github.com/sunwukonga/paypal-qor-admin/config/auth"
 	"github.com/sunwukonga/paypal-qor-admin/config/i18n"
 	"github.com/sunwukonga/paypal-qor-admin/db"
+	myutils "github.com/sunwukonga/paypal-qor-admin/utils"
 )
 
 var Admin *admin.Admin
 var ActionBar *action_bar.ActionBar
 var Countries = []string{"China", "Japan", "USA"}
-var src = rand.NewSource(time.Now().UnixNano())
-
-const letterBytes = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-const (
-	letterIdxBits = 6                    // 6 bits to represent a letter index
-	letterIdxMask = 1<<letterIdxBits - 1 // All 1-bits, as many as letterIdxBits
-	letterIdxMax  = 63 / letterIdxBits   // # of letter indices fitting in 63 bits
-)
 
 func init() {
 	Admin = admin.New(&qor.Config{DB: db.DB.Set("publish:draft_mode", true)})
@@ -523,11 +515,6 @@ func init() {
 		Type:  "readonly",
 	})
 	subscriptions.Meta(&admin.Meta{
-		Name:  "PaymentStatus",
-		Label: "Status",
-		Type:  "readonly",
-	})
-	subscriptions.Meta(&admin.Meta{
 		Name:  "CancelledAt",
 		Label: "Cancel Date",
 		Type:  "date",
@@ -567,7 +554,7 @@ func init() {
 		Label: "Status",
 		Type:  "readonly",
 	})
-	payments.Meta(&admin.Meta{
+	associatedTransactions.Meta(&admin.Meta{
 		Name:  "McCurrency",
 		Label: "Currency",
 		Type:  "readonly",
@@ -645,21 +632,83 @@ func init() {
 				if err := tx.Where("user_id = ?", user.ID).First(influencerCoupon).Error; err != nil {
 					//Inspect error. Hopefully, that it wasn't found.
 					// Create Coupon
-					n := 6
-					b := make([]byte, n)
-					// http://stackoverflow.com/questions/22892120/how-to-generate-a-random-string-of-a-fixed-length-in-golang
-					for i, cache, remain := n-1, src.Int63(), letterIdxMax; i >= 0; {
-						if remain == 0 {
-							cache, remain = src.Int63(), letterIdxMax
-						}
-						if idx := int(cache & letterIdxMask); idx < len(letterBytes) {
-							b[i] = letterBytes[idx]
-							i--
-						}
-						cache >>= letterIdxBits
-						remain--
+					/*
+						n := 6
+						b := make([]byte, n)
+						// http://stackoverflow.com/questions/22892120/how-to-generate-a-random-string-of-a-fixed-length-in-golang
+						for i, cache, remain := n-1, src.Int63(), letterIdxMax; i >= 0; {
+							if remain == 0 {
+								cache, remain = src.Int63(), letterIdxMax
+							}
+							if idx := int(cache & letterIdxMask); idx < len(letterBytes) {
+								b[i] = letterBytes[idx]
+								i--
+							}
+							cache >>= letterIdxBits
+							remain--
+						} */
+
+					influencerCoupon.Code = string(myutils.GenRandAlpNum(6))
+					influencerCoupon.UserID = user.ID
+					influencerCoupon.User = *user
+
+					//Add InfluencerCoupon to DB
+					if err := tx.Save(influencerCoupon).Error; err != nil {
+						tx.Rollback()
+						return err
 					}
-					influencerCoupon.Code = string(b)
+				} else {
+					// User already has a coupon code. Not good. Nothing to do.
+					fmt.Println("Error. We should not be here. Influencer already had coupon code.")
+				}
+
+			}
+
+			tx.Commit()
+			return nil
+		},
+		Visible: func(record interface{}, context *admin.Context) bool {
+			if user, ok := record.(*models.User); ok {
+				//return true if InfluencerCoupon doesn't exist, or it is invalid.
+				if user.Role == models.RoleInfluencer {
+					influencerCoupon := &models.InfluencerCoupon{}
+					if err := context.GetDB().Where("user_id = ?", user.ID).First(influencerCoupon).Error; err != nil {
+						if err.Error() == "record not found" {
+							return true
+						} else {
+							// Ooops, we found a real error
+							fmt.Println("Error fetching coupon: ", err.Error())
+							return true
+						}
+					} else {
+						// Following test for invalidity is not complete. Code should only contain [A-Z\d]
+						if len(influencerCoupon.Code) != 6 {
+							return true
+						}
+					}
+				}
+			}
+			return false
+		},
+		Modes: []string{"show", "menu_item"},
+	})
+	user.Action(&admin.Action{
+		Name: "GenerateGush",
+		Handle: func(argument *admin.ActionArgument) error {
+			var (
+				tx = argument.Context.GetDB().Begin()
+			)
+
+			for _, record := range argument.FindSelectedRecords() {
+				user := record.(*models.User)
+				// Create a new GUSH code.
+				// Check that the code does not already exist. Very, very unlikely.
+				// Insert code into database.
+				influencerCoupon := &models.InfluencerCoupon{}
+				if err := tx.Where("user_id = ?", user.ID).First(influencerCoupon).Error; err != nil {
+					//Inspect error. Hopefully, that it wasn't found.
+					// Create Coupon
+					influencerCoupon.Code = "GUSH" + string(myutils.GenRandAlpNum(2))
 					influencerCoupon.UserID = user.ID
 					influencerCoupon.User = *user
 
@@ -704,7 +753,6 @@ func init() {
 		Modes: []string{"show", "menu_item"},
 	})
 	user.Meta(&admin.Meta{Name: "Gender", Config: &admin.SelectOneConfig{Collection: []string{"Male", "Female", "Unknown"}}})
-	// TODO: replace Role strings with string constants
 	user.Meta(&admin.Meta{Name: "Role", Config: &admin.SelectOneConfig{Collection: models.Roles}})
 	user.Meta(&admin.Meta{Name: "Password",
 		Type:            "password",

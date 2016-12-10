@@ -23,6 +23,8 @@ const (
 	PaypalTimeFmt string = "15:04:05 Jan 02, 2006 MST"
 )
 
+var IPNLogger *log.Logger
+
 func IpnReceiver(ctx *gin.Context) {
 	//func IpnReceiver(w http.ResponseWriter, r *http.Request) {
 	var (
@@ -68,24 +70,27 @@ func IpnReceiver(ctx *gin.Context) {
 	// *********************************************************
 	// Test for VERIFIED
 	// *********************************************************
+	IPNLogger.Println("-----------------------------------Begin-------------------------------------------")
 	if string(verifyStatus) != "VERIFIED" {
-		log.Printf("Response: %v", string(verifyStatus))
-		log.Println("This indicates that an attempt was made to spoof this interface, or we have a bug.")
+		IPNLogger.Printf("Response: %v", string(verifyStatus))
+		IPNLogger.Println("This indicates that an attempt was made to spoof this interface, or we have a bug.")
 		return
 	}
 	// We can now assume that the POSTed information in `body` is VERIFIED to be from Paypal.
-	log.Printf("Response: %v", string(verifyStatus))
+	IPNLogger.Printf("Response: %v", string(verifyStatus))
 
 	values, _ := url.ParseQuery(string(body))
 	for i, v := range values {
-		fmt.Println(i, v)
+		IPNLogger.Println(i, v)
 	}
 
 	// Test for "test_ipn"
 	if _, keyExists := values["test_ipn"]; keyExists {
 		// We have received a testing IPN from Paypal
 		if isProduction {
-			log.Printf("WARNING: We have received a TEST IPN from paypal in Production Mode, ignoring!")
+			IPNLogger.Println("******************************************************************************")
+			IPNLogger.Printf("WARNING: We have received a TEST IPN from paypal in Production Mode, ignoring!")
+			IPNLogger.Println("******************************************************************************")
 			return
 		} else {
 			// Carry on, TEST IPN received into testing environment.
@@ -95,14 +100,18 @@ func IpnReceiver(ctx *gin.Context) {
 		if isProduction {
 			// Carry on, Live IPN received in Production Mode.
 		} else {
-			log.Printf("WARNING: We have received a LIVE IPN from paypal in Development Mode!")
+			IPNLogger.Println("******************************************************************************")
+			IPNLogger.Printf("WARNING: We have received a LIVE IPN from paypal in Development Mode!")
+			IPNLogger.Println("******************************************************************************")
 			// Continue, but this could get messy!
 		}
 	}
 	// Grab custom data
 	custom := map[string]string{}
 	if err := json.Unmarshal([]byte(values["custom"][0]), &custom); err != nil {
-		fmt.Println("Error, could not unmarshal JSON:", err.Error())
+		IPNLogger.Println("**********************************************************************")
+		IPNLogger.Println("Error, could not unmarshal JSON:", err.Error())
+		IPNLogger.Println("**********************************************************************")
 	}
 
 	// Prepare copy of appropriate Subscription for use in Switch below.
@@ -118,6 +127,7 @@ func IpnReceiver(ctx *gin.Context) {
 		switch values["txn_type"][0] {
 		case "subscr_signup":
 			// Setup new Subscription
+			IPNLogger.Println("### SUBSCR SIGNUP ###")
 			if len(values["payer_id"]) > 0 {
 				// Create or Fetch paypalPayer
 				paypalPayer = models.NewPaypalPayer(values["payer_id"][0], DB(ctx))
@@ -170,6 +180,7 @@ func IpnReceiver(ctx *gin.Context) {
 
 		case "subscr_payment":
 			// Create PaypalPayment if the payment has been successful.
+			IPNLogger.Println("### SUBSCR PAYMENT ###")
 			if len(values["payment_status"]) > 0 {
 				if values["payment_status"][0] == "Completed" {
 					//Success
@@ -214,15 +225,20 @@ func IpnReceiver(ctx *gin.Context) {
 						// information in favour of a paypal note for now.
 					} else {
 						//Error: We have nothing to identify the payment with.
-						log.Printf("WARNING(IpnReceiver): Payment had no `payer_id`!")
+						IPNLogger.Println("**********************************************************************")
+						IPNLogger.Printf("WARNING(IpnReceiver): Payment had no `payer_id`!")
+						IPNLogger.Println("**********************************************************************")
 					}
 				} else {
 					// Log any payment_status that mean we haven't been paid.
-					log.Printf("WARNING(IpnReceiver): We received a `payment_status` of %v", values["payment_status"][0])
+					IPNLogger.Println("**********************************************************************")
+					IPNLogger.Printf("WARNING(IpnReceiver): We received a `payment_status` of %v", values["payment_status"][0])
+					IPNLogger.Println("**********************************************************************")
 				}
 				// Ignore this as it means paypal sent con-conforming data.
 			}
 		case "subscr_cancel":
+			IPNLogger.Println("### SUBSCR CANCEL ###")
 			// Record a cancel event against the Subscription. Wait for subscr_eot...
 			//Get the referred to Subscription.
 			if len(subscription.SubscrID) > 0 {
@@ -230,27 +246,38 @@ func IpnReceiver(ctx *gin.Context) {
 				models.SubscriptionState.Trigger("cancel", subscription, DB(ctx))
 			} else {
 				// Log attempt to cancel a subscription without reference to "subscr_id"
-				log.Printf("WARNING(IpnReceiver): Subscription cancel sent that doesn't match a Subscription")
+				IPNLogger.Println("**********************************************************************")
+				IPNLogger.Printf("WARNING(IpnReceiver): Subscription cancel sent that doesn't match a Subscription")
+				IPNLogger.Println("**********************************************************************")
 			}
 		case "subscr_failed":
+			IPNLogger.Println("### SUBSCR FAILED ###")
 			// Enter "unpaid" state
 			if len(subscription.SubscrID) > 0 {
 				models.SubscriptionState.Trigger("fail", subscription, DB(ctx))
 			} else {
-				log.Printf("WARNING(IpnReceiver): Subscription failed sent that doesn't match a Subscription")
+				IPNLogger.Println("**********************************************************************")
+				IPNLogger.Printf("WARNING(IpnReceiver): Subscription failed sent that doesn't match a Subscription")
+				IPNLogger.Println("**********************************************************************")
 				// Log attempt to register an unpaid event without reference to "subscr_id"
 			}
 		case "subscr_eot":
+			IPNLogger.Println("### SUBSCR EOT ###")
 			// Enter "eot" (end of term) state
 			if len(subscription.SubscrID) > 0 {
 				models.SubscriptionState.Trigger("eot", subscription, DB(ctx))
 			} else {
 				// Log attempt to end a subscription without reference to "subscr_id"
-				log.Printf("WARNING(IpnReceiver): Subscription eot sent that doesn't match a Subscription")
+				IPNLogger.Println("**********************************************************************")
+				IPNLogger.Printf("WARNING(IpnReceiver): Subscription eot sent that doesn't match a Subscription")
+				IPNLogger.Println("**********************************************************************")
 			}
 		case "subscr_modify":
+			IPNLogger.Println("### SUBSCR EOT ###")
 			// We are not expecting this. Log the occurance.
-			log.Printf("WARNING(IpnReceiver): Subscription modify sent, but we don't accept them")
+			IPNLogger.Println("**********************************************************************")
+			IPNLogger.Printf("WARNING(IpnReceiver): Subscription modify sent, but we don't accept them")
+			IPNLogger.Println("**********************************************************************")
 		} // End switch
 	} // End test for txn_type
 } // End func

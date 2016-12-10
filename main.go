@@ -2,11 +2,14 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/gorilla/csrf"
 	"github.com/qor/qor/utils"
+	"github.com/sunwukonga/paypal-qor-admin/app/controllers"
 	"github.com/sunwukonga/paypal-qor-admin/config"
 	"github.com/sunwukonga/paypal-qor-admin/config/admin"
 	"github.com/sunwukonga/paypal-qor-admin/config/api"
@@ -23,6 +26,14 @@ func main() {
 
 	api.API.MountTo("/api", mux)
 	admin.Filebox.MountTo("/downloads", mux)
+
+	// Open IPN log file and create the logger.
+	f, err := os.OpenFile("ipn.log", os.O_APPEND|os.O_CREATE|os.O_RDWR, 0666)
+	if err != nil {
+		fmt.Printf("error opening file: %v", err)
+	}
+	defer f.Close()
+	controllers.IPNLogger = log.New(f, "", log.LstdFlags)
 
 	/*
 		for _, path := range []string{"system", "javascripts", "stylesheets", "images"} {

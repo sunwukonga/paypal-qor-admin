@@ -3,28 +3,28 @@ package auth
 import (
 	"github.com/qor/admin"
 	"github.com/qor/qor"
-	"github.com/sunwukonga/paypal-qor-admin/app/models"
 	"github.com/qor/roles"
+	"github.com/sunwukonga/paypal-qor-admin/app/models"
 	"net/http"
 )
 
 func init() {
-	roles.Register("admin", func(req *http.Request, currentUser interface{}) bool {
+	roles.Register(models.RoleAdmin, func(req *http.Request, currentUser interface{}) bool {
 		return currentUser != nil && currentUser.(*models.User).Role == models.RoleAdmin
 	})
-	roles.Register("customer", func(req *http.Request, currentUser interface{}) bool {
+	roles.Register(models.RoleCustomer, func(req *http.Request, currentUser interface{}) bool {
 		return currentUser != nil && currentUser.(*models.User).Role == models.RoleCustomer
 	})
-	roles.Register("reseller", func(req *http.Request, currentUser interface{}) bool {
+	roles.Register(models.RoleReseller, func(req *http.Request, currentUser interface{}) bool {
 		return currentUser != nil && currentUser.(*models.User).Role == models.RoleReseller
 	})
-	roles.Register("influencer", func(req *http.Request, currentUser interface{}) bool {
+	roles.Register(models.RoleInfluencer, func(req *http.Request, currentUser interface{}) bool {
 		return currentUser != nil && currentUser.(*models.User).Role == models.RoleInfluencer
 	})
-	roles.Register("editor", func(req *http.Request, currentUser interface{}) bool {
+	roles.Register(models.RoleEditor, func(req *http.Request, currentUser interface{}) bool {
 		return currentUser != nil && currentUser.(*models.User).Role == models.RoleEditor
 	})
-	roles.Register("servicer", func(req *http.Request, currentUser interface{}) bool {
+	roles.Register(models.RoleServicer, func(req *http.Request, currentUser interface{}) bool {
 		return currentUser != nil && currentUser.(*models.User).Role == models.RoleServicer
 	})
 }

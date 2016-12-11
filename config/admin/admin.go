@@ -101,16 +101,16 @@ func init() {
 	assetManager := Admin.AddResource(&media_library.AssetManager{}, &admin.Config{Invisible: true})
 
 	//* Produc Management *//
-	color := Admin.AddResource(&models.Color{}, &admin.Config{Menu: []string{"Product Management"}, Permission: roles.Deny(roles.CRUD, models.Servicer, models.Influencer, models.Subscriber), Priority: -5})
-	Admin.AddResource(&models.Size{}, &admin.Config{Menu: []string{"Product Management"}, Permission: roles.Deny(roles.CRUD, models.Servicer, models.Influencer, models.Subscriber), Priority: -4})
+	color := Admin.AddResource(&models.Color{}, &admin.Config{Menu: []string{"Product Management"}, Permission: roles.Deny(roles.CRUD, models.RoleServicer, models.RoleInfluencer, models.RoleSubscriber), Priority: -5})
+	Admin.AddResource(&models.Size{}, &admin.Config{Menu: []string{"Product Management"}, Permission: roles.Deny(roles.CRUD, models.RoleServicer, models.RoleInfluencer, models.RoleSubscriber), Priority: -4})
 
-	category := Admin.AddResource(&models.Category{}, &admin.Config{Menu: []string{"Product Management"}, Permission: roles.Deny(roles.CRUD, models.Servicer, models.Influencer, models.Subscriber), Priority: -3})
+	category := Admin.AddResource(&models.Category{}, &admin.Config{Menu: []string{"Product Management"}, Permission: roles.Deny(roles.CRUD, models.RoleServicer, models.RoleInfluencer, models.RoleSubscriber), Priority: -3})
 	category.Meta(&admin.Meta{Name: "Categories", Type: "select_many"})
 
-	collection := Admin.AddResource(&models.Collection{}, &admin.Config{Menu: []string{"Product Management"}, Permission: roles.Deny(roles.CRUD, models.Servicer, models.Influencer, models.Subscriber), Priority: -2})
+	collection := Admin.AddResource(&models.Collection{}, &admin.Config{Menu: []string{"Product Management"}, Permission: roles.Deny(roles.CRUD, models.RoleServicer, models.RoleInfluencer, models.RoleSubscriber), Priority: -2})
 
 	// Add ProductImage as Media Libraray
-	ProductImagesResource := Admin.AddResource(&models.ProductImage{}, &admin.Config{Menu: []string{"Product Management"}, Permission: roles.Deny(roles.CRUD, models.Servicer, models.Influencer, models.Subscriber), Priority: -1})
+	ProductImagesResource := Admin.AddResource(&models.ProductImage{}, &admin.Config{Menu: []string{"Product Management"}, Permission: roles.Deny(roles.CRUD, models.RoleServicer, models.RoleInfluencer, models.RoleSubscriber), Priority: -1})
 
 	ProductImagesResource.Filter(&admin.Filter{
 		Name:   "SelectedType",
@@ -128,7 +128,7 @@ func init() {
 	ProductImagesResource.IndexAttrs("File", "Title")
 
 	// Add Product
-	product := Admin.AddResource(&models.Product{}, &admin.Config{Menu: []string{"Product Management"}, Permission: roles.Deny(roles.CRUD, models.Servicer, models.Influencer, models.Subscriber)})
+	product := Admin.AddResource(&models.Product{}, &admin.Config{Menu: []string{"Product Management"}, Permission: roles.Deny(roles.CRUD, models.RoleServicer, models.RoleInfluencer, models.RoleSubscriber)})
 	product.Meta(&admin.Meta{Name: "MadeCountry", Config: &admin.SelectOneConfig{Collection: Countries}})
 	product.Meta(&admin.Meta{Name: "Description", Config: &admin.RichEditorConfig{AssetManager: assetManager, Plugins: []admin.RedactorPlugin{
 		{Name: "medialibrary", Source: "/admin/assets/javascripts/qor_redactor_medialibrary.js"},
@@ -265,7 +265,7 @@ func init() {
 	})
 
 	// Add Order
-	order := Admin.AddResource(&models.Order{}, &admin.Config{Menu: []string{"Order Management"}, Permission: roles.Deny(roles.CRUD, models.Servicer, models.Influencer, models.Subscriber)})
+	order := Admin.AddResource(&models.Order{}, &admin.Config{Menu: []string{"Order Management"}, Permission: roles.Deny(roles.CRUD, models.RoleServicer, models.RoleInfluencer, models.RoleSubscriber)})
 	order.Meta(&admin.Meta{Name: "ShippingAddress", Type: "single_edit"})
 	order.Meta(&admin.Meta{Name: "BillingAddress", Type: "single_edit"})
 	order.Meta(&admin.Meta{Name: "ShippedAt", Type: "date"})
@@ -381,7 +381,7 @@ func init() {
 	activity.Register(order)
 
 	// Define another resource for same model
-	abandonedOrder := Admin.AddResource(&models.Order{}, &admin.Config{Name: "Abandoned Order", Menu: []string{"Order Management"}, Permission: roles.Deny(roles.CRUD, models.Servicer, models.Influencer, models.Subscriber)})
+	abandonedOrder := Admin.AddResource(&models.Order{}, &admin.Config{Name: "Abandoned Order", Menu: []string{"Order Management"}, Permission: roles.Deny(roles.CRUD, models.RoleServicer, models.RoleInfluencer, models.RoleSubscriber)})
 	abandonedOrder.Meta(&admin.Meta{Name: "ShippingAddress", Type: "single_edit"})
 	abandonedOrder.Meta(&admin.Meta{Name: "BillingAddress", Type: "single_edit"})
 
@@ -411,7 +411,7 @@ func init() {
 	abandonedOrder.ShowAttrs("-DiscountValue")
 
 	// Add Beauty Box Transactions
-	payments := Admin.AddResource(&models.PaypalPayment{}, &admin.Config{Name: "Transactions", Menu: []string{"Beauty Box"}, Permission: roles.Deny(roles.CRUD, models.Influencer, models.Subscriber)})
+	payments := Admin.AddResource(&models.PaypalPayment{}, &admin.Config{Name: "Transactions", Menu: []string{"Beauty Box"}, Permission: roles.Deny(roles.CRUD, models.RoleInfluencer, models.RoleSubscriber)})
 	payments.Meta(&admin.Meta{
 		Name:  "SubscrID",
 		Label: "Subscription",
@@ -419,12 +419,12 @@ func init() {
 	})
 	payments.Meta(&admin.Meta{
 		Name:  "UserID",
-		Label: models.Subscriber,
+		Label: models.RoleSubscriber,
 		Type:  "readonly",
 	})
 	payments.Meta(&admin.Meta{
 		Name:  "InfluencerID",
-		Label: models.Influencer,
+		Label: models.RoleInfluencer,
 		Type:  "readonly",
 	})
 	payments.Meta(&admin.Meta{
@@ -483,7 +483,19 @@ func init() {
 	)
 
 	// Add Beauty Box Subscriptions
-	subscriptions := Admin.AddResource(&models.Subscription{}, &admin.Config{Name: "Subscriptions", Menu: []string{"Beauty Box"}, Permission: roles.Deny(roles.CRUD, models.Influencer, models.Subscriber)})
+	subscriptions := Admin.AddResource(&models.Subscription{}, &admin.Config{Name: "Subscriptions", Menu: []string{"Beauty Box"}, Permission: roles.Deny(roles.CRUD, models.RoleInfluencer, models.RoleSubscriber)})
+	subscriptions.Scope(&admin.Scope{
+		Name: "Subscriptions",
+		Handle: func(db *gorm.DB, context *qor.Context) *gorm.DB {
+			currentUser := context.CurrentUser.(*models.User)
+			if currentUser.Role == models.RoleInfluencer {
+				return db.Where("influencer_id = ?", currentUser.ID)
+			} else {
+				return db
+			}
+		},
+		Default: true,
+	})
 	subscriptions.Meta(&admin.Meta{
 		Name:  "SubscrID",
 		Label: "ID",
@@ -491,12 +503,12 @@ func init() {
 	})
 	subscriptions.Meta(&admin.Meta{
 		Name:  "UserID",
-		Label: models.Subscriber,
+		Label: models.RoleSubscriber,
 		Type:  "readonly",
 	})
 	subscriptions.Meta(&admin.Meta{
 		Name:  "InfluencerID",
-		Label: models.Influencer,
+		Label: models.RoleInfluencer,
 		Type:  "readonly",
 	})
 	subscriptions.Meta(&admin.Meta{
@@ -569,7 +581,7 @@ func init() {
 		Type: "hidden",
 	})
 	associatedTransactions.Meta(&admin.Meta{
-		Name: models.Influencer,
+		Name: models.RoleInfluencer,
 		Type: "hidden",
 	})
 	associatedTransactions.ShowAttrs(
@@ -614,8 +626,9 @@ func init() {
 			}},
 		"SubscrPayments",
 	)
+
 	// Add User
-	user := Admin.AddResource(&models.User{}, &admin.Config{Menu: []string{"User Management"}, Permission: roles.Deny(roles.CRUD, models.Influencer, models.Subscriber)})
+	user := Admin.AddResource(&models.User{}, &admin.Config{Menu: []string{"User Management"}, Permission: roles.Deny(roles.CRUD, models.RoleInfluencer, models.RoleSubscriber)})
 	user.Action(&admin.Action{
 		Name: "GenerateCode",
 		Handle: func(argument *admin.ActionArgument) error {
@@ -855,7 +868,7 @@ func init() {
 	user.EditAttrs(user.NewAttrs())
 
 	// Add Store
-	store := Admin.AddResource(&models.Store{}, &admin.Config{Menu: []string{"Store Management"}, Permission: roles.Deny(roles.CRUD, models.Servicer, models.Influencer, models.Subscriber)})
+	store := Admin.AddResource(&models.Store{}, &admin.Config{Menu: []string{"Store Management"}, Permission: roles.Deny(roles.CRUD, models.RoleServicer, models.RoleInfluencer, models.RoleSubscriber)})
 	store.Meta(&admin.Meta{Name: "Owner", Type: "single_edit"})
 	store.AddValidator(func(record interface{}, metaValues *resource.MetaValues, context *qor.Context) error {
 		if meta := metaValues.Get("Name"); meta != nil {
@@ -867,24 +880,24 @@ func init() {
 	})
 
 	// Add Translations
-	Admin.AddResource(i18n.I18n, &admin.Config{Menu: []string{"Site Management"}, Permission: roles.Deny(roles.CRUD, models.Servicer, models.Influencer, models.Subscriber), Priority: 1})
+	Admin.AddResource(i18n.I18n, &admin.Config{Menu: []string{"Site Management"}, Permission: roles.Deny(roles.CRUD, models.RoleServicer, models.RoleInfluencer, models.RoleSubscriber), Priority: 1})
 
 	// Add SEOSetting
-	Admin.AddResource(&models.SEOSetting{}, &admin.Config{Menu: []string{"Site Management"}, Permission: roles.Deny(roles.CRUD, models.Servicer, models.Influencer, models.Subscriber), Singleton: true, Priority: 2})
+	Admin.AddResource(&models.SEOSetting{}, &admin.Config{Menu: []string{"Site Management"}, Permission: roles.Deny(roles.CRUD, models.RoleServicer, models.RoleInfluencer, models.RoleSubscriber), Singleton: true, Priority: 2})
 
 	// Add Worker
 	Worker := getWorker()
-	Admin.AddResource(Worker, &admin.Config{Menu: []string{"Site Management"}, Permission: roles.Deny(roles.CRUD, models.Servicer, models.Influencer, models.Subscriber)})
+	Admin.AddResource(Worker, &admin.Config{Menu: []string{"Site Management"}, Permission: roles.Deny(roles.CRUD, models.RoleServicer, models.RoleInfluencer, models.RoleSubscriber)})
 
 	db.Publish.SetWorker(Worker)
 	exchange_actions.RegisterExchangeJobs(i18n.I18n, Worker)
 
 	// Add Publish
-	Admin.AddResource(db.Publish, &admin.Config{Menu: []string{"Site Management"}, Permission: roles.Deny(roles.CRUD, models.Servicer, models.Influencer, models.Subscriber), Singleton: true})
+	Admin.AddResource(db.Publish, &admin.Config{Menu: []string{"Site Management"}, Permission: roles.Deny(roles.CRUD, models.RoleServicer, models.RoleInfluencer, models.RoleSubscriber), Singleton: true})
 	publish.RegisterL10nForPublish(db.Publish, Admin)
 
 	// Add Setting
-	Admin.AddResource(&models.Setting{}, &admin.Config{Name: "Shop Setting", Permission: roles.Deny(roles.CRUD, models.Servicer, models.Influencer, models.Subscriber), Singleton: true})
+	Admin.AddResource(&models.Setting{}, &admin.Config{Name: "Shop Setting", Permission: roles.Deny(roles.CRUD, models.RoleServicer, models.RoleInfluencer, models.RoleSubscriber), Singleton: true})
 
 	// Add Search Center Resources
 	Admin.AddSearchResource(product, user, order)

@@ -424,6 +424,20 @@ func init() {
 		},
 		Default: true,
 	})
+	// Override Delete action permissions.
+	payments.GetAction("Delete").Permission = roles.Allow(roles.Delete, models.RoleAdmin)
+	/*
+		&admin.Action{
+			Name:   "Delete",
+			Method: "DELETE",
+			URL: func(record interface{}, context *admin.Context) string {
+				return context.URLFor(record, context.Resource)
+			},
+			Permission: roles.Deny(roles.Delete, roles.Anyone).Allow(roles.Delete, models.RoleAdmin),
+			Modes:      []string{"menu_item"},
+		})
+	*/
+
 	payments.Meta(&admin.Meta{
 		Name:  "SubscrID",
 		Label: "Subscription",
@@ -496,6 +510,7 @@ func init() {
 
 	// Add Beauty Box Subscriptions
 	subscriptions := Admin.AddResource(&models.Subscription{}, &admin.Config{Name: "Subscriptions", Menu: []string{"Beauty Box"}, Permission: roles.Deny(roles.CRUD, models.RoleSubscriber)})
+	subscriptions.GetAction("Delete").Permission = roles.Allow(roles.Delete, models.RoleAdmin)
 	subscriptions.Scope(&admin.Scope{
 		Name: "Subscriptions",
 		Handle: func(db *gorm.DB, context *qor.Context) *gorm.DB {
@@ -641,6 +656,7 @@ func init() {
 
 	// Add User
 	user := Admin.AddResource(&models.User{}, &admin.Config{Menu: []string{"User Management"}, Permission: roles.Deny(roles.CRUD, models.RoleSubscriber)})
+	user.GetAction("Delete").Permission = roles.Allow(roles.Delete, models.RoleAdmin, models.RoleServicer)
 	user.Scope(&admin.Scope{
 		Name: "Users",
 		Handle: func(db *gorm.DB, context *qor.Context) *gorm.DB {

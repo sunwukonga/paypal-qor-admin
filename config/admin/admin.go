@@ -411,7 +411,19 @@ func init() {
 	abandonedOrder.ShowAttrs("-DiscountValue")
 
 	// Add Beauty Box Transactions
-	payments := Admin.AddResource(&models.PaypalPayment{}, &admin.Config{Name: "Transactions", Menu: []string{"Beauty Box"}, Permission: roles.Deny(roles.CRUD, models.RoleInfluencer, models.RoleSubscriber)})
+	payments := Admin.AddResource(&models.PaypalPayment{}, &admin.Config{Name: "Transactions", Menu: []string{"Beauty Box"}, Permission: roles.Deny(roles.CRUD, models.RoleSubscriber)})
+	payments.Scope(&admin.Scope{
+		Name: "Payments",
+		Handle: func(db *gorm.DB, context *qor.Context) *gorm.DB {
+			currentUser := context.CurrentUser.(*models.User)
+			if currentUser.Role == models.RoleInfluencer {
+				return db.Where("influencer_id = ?", currentUser.ID)
+			} else {
+				return db
+			}
+		},
+		Default: true,
+	})
 	payments.Meta(&admin.Meta{
 		Name:  "SubscrID",
 		Label: "Subscription",
@@ -483,7 +495,7 @@ func init() {
 	)
 
 	// Add Beauty Box Subscriptions
-	subscriptions := Admin.AddResource(&models.Subscription{}, &admin.Config{Name: "Subscriptions", Menu: []string{"Beauty Box"}, Permission: roles.Deny(roles.CRUD, models.RoleInfluencer, models.RoleSubscriber)})
+	subscriptions := Admin.AddResource(&models.Subscription{}, &admin.Config{Name: "Subscriptions", Menu: []string{"Beauty Box"}, Permission: roles.Deny(roles.CRUD, models.RoleSubscriber)})
 	subscriptions.Scope(&admin.Scope{
 		Name: "Subscriptions",
 		Handle: func(db *gorm.DB, context *qor.Context) *gorm.DB {
@@ -628,7 +640,19 @@ func init() {
 	)
 
 	// Add User
-	user := Admin.AddResource(&models.User{}, &admin.Config{Menu: []string{"User Management"}, Permission: roles.Deny(roles.CRUD, models.RoleInfluencer, models.RoleSubscriber)})
+	user := Admin.AddResource(&models.User{}, &admin.Config{Menu: []string{"User Management"}, Permission: roles.Deny(roles.CRUD, models.RoleSubscriber)})
+	user.Scope(&admin.Scope{
+		Name: "Users",
+		Handle: func(db *gorm.DB, context *qor.Context) *gorm.DB {
+			currentUser := context.CurrentUser.(*models.User)
+			if currentUser.Role == models.RoleInfluencer {
+				return db.Where("id = ?", currentUser.ID)
+			} else {
+				return db
+			}
+		},
+		Default: true,
+	})
 	user.Action(&admin.Action{
 		Name: "GenerateCode",
 		Handle: func(argument *admin.ActionArgument) error {

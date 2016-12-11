@@ -30,7 +30,7 @@ type QorWidgetSetting struct {
 func initWidgets() {
 	if Widgets == nil {
 		Widgets = widget.New(&widget.Config{DB: db.DB})
-		Widgets.WidgetSettingResource = Admin.AddResource(&QorWidgetSetting{}, &admin.Config{Menu: []string{"Site Management"}, Permission: roles.Deny(roles.CRUD, "servicer"), Priority: 3})
+		Widgets.WidgetSettingResource = Admin.AddResource(&QorWidgetSetting{}, &admin.Config{Menu: []string{"Site Management"}, Permission: roles.Deny(roles.CRUD, models.RoleServicer, models.RoleInfluencer, models.RoleSubscriber), Priority: 3})
 		Widgets.WidgetSettingResource.Meta(&admin.Meta{Name: "Name", FormattedValuer: func(widget interface{}, ctx *qor.Context) interface{} {
 			setting := widget.(*QorWidgetSetting)
 			return template.HTML(`<img src="/images/Widget-` + setting.WidgetType + `.png" width="80" height="35" style="margin-right: 12px;"/><span>` + setting.Name + `</span>`)

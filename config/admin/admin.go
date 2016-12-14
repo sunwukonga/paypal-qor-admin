@@ -511,6 +511,26 @@ func init() {
 	// Add Beauty Box Subscriptions
 	subscriptions := Admin.AddResource(&models.Subscription{}, &admin.Config{Name: "Subscriptions", Menu: []string{"Beauty Box"}, Permission: roles.Deny(roles.CRUD, models.RoleSubscriber)})
 	subscriptions.GetAction("Delete").Permission = roles.Allow(roles.Delete, models.RoleAdmin)
+	subscriptions.Action(&admin.Action{
+		Name: "Cancel",
+		Handle: func(argument *admin.ActionArgument) error {
+			for _, record := range argument.FindSelectedRecords() {
+				subscription := record.(*models.Subscription)
+				models.SubscriptionState.Trigger(models.EventCancel, subscription, argument.Context.GetDB())
+				return nil
+			}
+			return nil
+		},
+		Visible: func(record interface{}, context *admin.Context) bool {
+			if subscription, ok := record.(*models.Subscription); ok {
+				if subscription.UserID == 16 {
+					return true
+				}
+			}
+			return false
+		},
+		Modes: []string{"show"},
+	})
 	subscriptions.Scope(&admin.Scope{
 		Name: "Subscriptions",
 		Handle: func(db *gorm.DB, context *qor.Context) *gorm.DB {

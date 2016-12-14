@@ -108,10 +108,12 @@ func IpnReceiver(ctx *gin.Context) {
 	}
 	// Grab custom data
 	custom := map[string]string{}
-	if err := json.Unmarshal([]byte(values["custom"][0]), &custom); err != nil {
-		IPNLogger.Println("**********************************************************************")
-		IPNLogger.Println("Error, could not unmarshal JSON:", err.Error())
-		IPNLogger.Println("**********************************************************************")
+	if len(values["custom"]) > 0 {
+		if err := json.Unmarshal([]byte(values["custom"][0]), &custom); err != nil {
+			IPNLogger.Println("**********************************************************************")
+			IPNLogger.Println("Error, could not unmarshal JSON:", err.Error())
+			IPNLogger.Println("**********************************************************************")
+		}
 	}
 
 	// Prepare copy of appropriate Subscription for use in Switch below.
@@ -154,9 +156,9 @@ func IpnReceiver(ctx *gin.Context) {
 				recurTimes, _ := strconv.Atoi(values["recur_times"][0])
 				subscription.RecurTimes = recurTimes
 
-				subDate, _ := time.Parse(PaypalTimeFmt, values["subscr_date"][0])
-				//subDateSGT := subDate.In(config.SGT)
-				subscription.SubscrDate = subDate.In(config.SGT)
+				subDateXXX, _ := time.Parse(PaypalTimeFmt, values["subscr_date"][0])
+				subDate := subDateXXX.In(config.SGT)
+				subscription.SubscrDate = subDate
 
 				subscription.Period = values["period3"][0]
 				periodStrings := strings.Split(subscription.Period, " ")
@@ -174,8 +176,14 @@ func IpnReceiver(ctx *gin.Context) {
 					eotAt = subDate.AddDate(periodFactor*recurTimes, 0, 0)
 				}
 				subscription.EotAt = eotAt
+				paypalPayment := models.PaypalPayment{}
+				if err := DB(ctx).Where("subscr_id = ?", subscription.SubscrID).Model(&paypalPayment); err == nil {
+					models.SubscriptionState.Trigger(models.EventSignup, subscription, DB(ctx))
+				} else {
+					models.SubscriptionState.Trigger(models.EventSignunpaid, subscription, DB(ctx))
+				}
 
-				DB(ctx).Create(subscription)
+				//DB(ctx).Create(subscription)
 			}
 
 		case "subscr_payment":
@@ -217,7 +225,7 @@ func IpnReceiver(ctx *gin.Context) {
 						DB(ctx).Create(paypalPayment)
 						if len(subscription.SubscrID) > 0 {
 							// Subscription already exists, our state machine is in known state. We can call Trigger.
-							models.SubscriptionState.Trigger("payment", subscription, DB(ctx))
+							models.SubscriptionState.Trigger(models.EventPayment, subscription, DB(ctx))
 						}
 
 						// TODO: <Long term> Create a new Order to accomodate this payment and fastforward to "paid"
@@ -242,8 +250,35 @@ func IpnReceiver(ctx *gin.Context) {
 			// Record a cancel event against the Subscription. Wait for subscr_eot...
 			//Get the referred to Subscription.
 			if len(subscription.SubscrID) > 0 {
+				// Update subscription values["subscr_id"][0] with End Date -> n * months + start date
+				subscription = &models.Subscription{}
+				paypalPayment = &models.PaypalPayment{}
+				if len(values["subscr_id"]) > 0 {
+					if err := DB(ctx).Where("subscr_id = ?", values["subscr_id"][0]).First(subscription).Error; err == nil {
+						eotAt := time.Now().In(config.SGT)
+						periodStrings := strings.Split(subscription.Period, " ")
+						periodFactor, _ := strconv.Atoi(periodStrings[0])
+						subDate := subscription.SubscrDate
+						count := int(0)
+						DB(ctx).Model(paypalPayment).Where("subscr_id = ? AND payment_status = ?", subscription.SubscrID, "Completed").Count(&count)
+						switch periodStrings[1] {
+						case "D":
+							eotAt = subDate.AddDate(0, 0, periodFactor*count)
+						case "W":
+							eotAt = subDate.AddDate(0, 0, periodFactor*7*count)
+						case "M":
+							eotAt = subDate.AddDate(0, periodFactor*count, 0)
+						case "Y":
+							eotAt = subDate.AddDate(periodFactor*count, 0, 0)
+						}
+						subscription.EotAt = eotAt
+						//			DB(ctx).Model(subscription).Update("eot_at", eotAt)
+					}
+				}
 
-				models.SubscriptionState.Trigger("cancel", subscription, DB(ctx))
+				IPNLogger.Printf("Notify(IpnReceiver): Attempting to change state to cancelled")
+				models.SubscriptionState.Trigger(models.EventCancel, subscription, DB(ctx))
+
 			} else {
 				// Log attempt to cancel a subscription without reference to "subscr_id"
 				IPNLogger.Println("**********************************************************************")
@@ -254,7 +289,7 @@ func IpnReceiver(ctx *gin.Context) {
 			IPNLogger.Println("### SUBSCR FAILED ###")
 			// Enter "unpaid" state
 			if len(subscription.SubscrID) > 0 {
-				models.SubscriptionState.Trigger("fail", subscription, DB(ctx))
+				models.SubscriptionState.Trigger(models.EventFail, subscription, DB(ctx))
 			} else {
 				IPNLogger.Println("**********************************************************************")
 				IPNLogger.Printf("WARNING(IpnReceiver): Subscription failed sent that doesn't match a Subscription")
@@ -265,7 +300,7 @@ func IpnReceiver(ctx *gin.Context) {
 			IPNLogger.Println("### SUBSCR EOT ###")
 			// Enter "eot" (end of term) state
 			if len(subscription.SubscrID) > 0 {
-				models.SubscriptionState.Trigger("eot", subscription, DB(ctx))
+				models.SubscriptionState.Trigger(models.EventEOT, subscription, DB(ctx))
 			} else {
 				// Log attempt to end a subscription without reference to "subscr_id"
 				IPNLogger.Println("**********************************************************************")
@@ -278,6 +313,55 @@ func IpnReceiver(ctx *gin.Context) {
 			IPNLogger.Println("**********************************************************************")
 			IPNLogger.Printf("WARNING(IpnReceiver): Subscription modify sent, but we don't accept them")
 			IPNLogger.Println("**********************************************************************")
+		case "send_money":
+			IPNLogger.Println("**********************************************************************")
+			IPNLogger.Println("### SEND MONEY ###")
+			IPNLogger.Println("**********************************************************************")
+		default:
+			IPNLogger.Println("### SUBSCR_ID UNDEFINED ###")
+			IPNLogger.Println("**********************************************************************")
+			IPNLogger.Printf("WARNING(IpnReceiver): IPN message received that we DON'T understand. Investigate!")
+			IPNLogger.Println("**********************************************************************")
 		} // End switch
 	} // End test for txn_type
+
+	// Check for Payment Reversed.
+	if len(values["payment_status"]) > 0 {
+		if values["payment_status"][0] == "Reversed" {
+			// Update parent Txn values["parent_txn_id"][0] with Status -> Reversed
+			paypalPayment = &models.PaypalPayment{}
+			if len(values["parent_txn_id"]) > 0 {
+				if err := DB(ctx).Where("txn_id = ?", values["parent_txn_id"][0]).First(paypalPayment).Error; err == nil {
+					DB(ctx).Model(paypalPayment).Update("payment_status", "Reversed")
+				}
+			}
+			// Update subscription values["subscr_id"][0] with End Date -> n * months + start date
+			subscription = &models.Subscription{}
+			if len(values["subscr_id"]) > 0 {
+				if err := DB(ctx).Where("subscr_id = ?", values["subscr_id"][0]).First(subscription).Error; err == nil {
+					eotAt := time.Now().In(config.SGT)
+					periodStrings := strings.Split(subscription.Period, " ")
+					periodFactor, _ := strconv.Atoi(periodStrings[0])
+					subDate := subscription.SubscrDate
+					count := int(0)
+					DB(ctx).Model(paypalPayment).Where("subscr_id = ? AND payment_status = ?", subscription.SubscrID, "Completed").Count(&count)
+					switch periodStrings[1] {
+					case "D":
+						eotAt = subDate.AddDate(0, 0, periodFactor*count)
+					case "W":
+						eotAt = subDate.AddDate(0, 0, periodFactor*7*count)
+					case "M":
+						eotAt = subDate.AddDate(0, periodFactor*count, 0)
+					case "Y":
+						eotAt = subDate.AddDate(periodFactor*count, 0, 0)
+					}
+					subscription.EotAt = eotAt
+					// This is not associated with an Event as yet. It should probably use UpdateColumn
+					DB(ctx).Model(subscription).Update("eot_at", eotAt)
+				}
+			}
+
+		}
+	}
+
 } // End func

@@ -10,6 +10,21 @@ import (
 	//	"github.com/sunwukonga/paypal-qor-admin/app/models"
 )
 
+const (
+	stateDraft      string = "draft"
+	stateActive     string = "active"
+	stateCancelled  string = "cancelled"
+	stateUnpaid     string = "unpaid"
+	stateEOT        string = "eot"
+	EventSignup     string = "signup"
+	EventSignunpaid string = "signunpaid"
+	EventPayment    string = "payment"
+	EventReverse    string = "reverse"
+	EventFail       string = "fail"
+	EventCancel     string = "cancel"
+	EventEOT        string = "endterm"
+)
+
 type Subscription struct {
 	gorm.Model
 	UserID       uint
@@ -134,24 +149,35 @@ var (
 
 func init() {
 	// Define Subscription's States
-	SubscriptionState.Initial("draft")
-	SubscriptionState.State("active")
-	SubscriptionState.State("cancelled").Enter(func(value interface{}, tx *gorm.DB) error {
-		tx.Model(value).UpdateColumn("cancelled_at", time.Now().In(config.SGT))
-		return nil
+	SubscriptionState.Initial(stateDraft)
+	SubscriptionState.State(stateActive)
+	SubscriptionState.State(stateCancelled).Enter(func(value interface{}, tx *gorm.DB) error {
+		// Need to move EotAt calculation in here.
+		subscription := Subscription{CancelledAt: time.Now().In(config.SGT)}
+		subscription.SetState(stateCancelled)
+		return tx.Model(value).UpdateColumns(subscription).Error
 	})
-	SubscriptionState.State("unpaid")
-	SubscriptionState.State("eot")
+	SubscriptionState.State(stateUnpaid)
+	SubscriptionState.State(stateEOT)
 
 	// Define Subscription's Events
-	SubscriptionState.Event("signup").To("active").From("draft")
+	SubscriptionState.Event(EventSignup).To(stateActive).From(stateDraft).After(func(value interface{}, tx *gorm.DB) error {
+		subscription := value.(*Subscription)
+		subscription.SetState(stateActive)
+		return tx.Create(subscription).Error
+	})
+	SubscriptionState.Event(EventSignunpaid).To(stateUnpaid).From(stateDraft).After(func(value interface{}, tx *gorm.DB) error {
+		subscription := value.(*Subscription)
+		subscription.SetState(stateUnpaid)
+		return tx.Create(subscription).Error
+	})
 
-	paymentEvent := SubscriptionState.Event("payment")
-	paymentEvent.To("active").From("active")
-	paymentEvent.To("active").From("unpaid")
+	paymentEvent := SubscriptionState.Event(EventPayment)
+	paymentEvent.To(stateActive).From(stateActive)
+	paymentEvent.To(stateActive).From(stateUnpaid)
 
-	SubscriptionState.Event("cancel").To("cancelled").From("active") // Don't include `From("unpaid")`, as I don't want to lose that info.
-	SubscriptionState.Event("fail").To("unpaid").From("active", "unpaid")
-	SubscriptionState.Event("eot").To("eot").From("active", "unpaid", "cancelled")
+	SubscriptionState.Event(EventCancel).To(stateCancelled).From(stateActive) // Don't include `From("unpaid")`, as I don't want to lose that info.
+	SubscriptionState.Event(EventFail).To(stateUnpaid).From(stateActive, stateUnpaid)
+	SubscriptionState.Event(EventEOT).To(stateEOT).From(stateActive, stateUnpaid, stateCancelled)
 
 }

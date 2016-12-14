@@ -1,13 +1,8 @@
-<p>/home/vagrant/code/go/src/github.com/sunwukonga/paypal-qor-admin/app/views/auth/login.html.tpl</p>
 <div class="container">
     <div class="row">
         <div class="column column-12">
             <div class="auth login">
                 <form action="{{mountpathed "login"}}" method="POST">
-                    <div>
-                      Demo Account: dev@getqor.com/testing
-                    </div>
-
                     <ul class="auth-form">
                         {{if .error}}
                             <li class="error">{{.error}}</li>
@@ -32,7 +27,7 @@
                             <button type="submit" class="button button__primary">{{ t "login.button" }}</button>
                         </li>
 
-                        {{if .showRegister}}<li>{{ t "login.Need an Account?" }} <a href="{{mountpathed "register"}}">{{ t "login.register" }}</a></li>{{end}}
+                        {{if .showRegister}}<li>{{ t "login.Need an Account?" "Need an Account?" }} <a href="{{mountpathed "register"}}">{{ t "login.register" }}</a></li>{{end}}
                     </ul>
 
                 </form>

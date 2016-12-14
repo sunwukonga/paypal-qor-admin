@@ -1,4 +1,3 @@
-<p>/home/vagrant/code/go/src/github.com/sunwukonga/paypal-qor-admin/app/views/auth/register.html.tpl</p>
 <div class="container">
     <div class="row">
         <div class="column column-12">

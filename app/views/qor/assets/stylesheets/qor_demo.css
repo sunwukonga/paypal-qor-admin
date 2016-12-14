@@ -46,3 +46,7 @@
     max-height: 30px;
     margin-right: 8px;
 }
+
+[qor-icon-name="Beauty Box"] > a::before{
+  content: "\e1db";
+}

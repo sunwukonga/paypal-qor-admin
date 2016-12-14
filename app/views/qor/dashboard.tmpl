@@ -1,6 +1,6 @@
 <div class="qor-page__body">
   <div class="qor-section introduction">
-    <h5>This is the SC BEAUTY BOX backend</h5>
+    <h5>Welcome to the SC BEAUTY BOX backend</h5>
   </div>
 
   <!-- if have table please add qor-section__table className -->
@@ -13,6 +13,7 @@
     </div>
   </div>
 
+  {{ if or (eq .CurrentUser.Role "Servicer") (eq .CurrentUser.Role "Admin") }} 
   <div class="qor-section reports">
     <div class="qor-section__header">
       <h4 class="qor-section-title">{{t "Reports"}}</h4>
@@ -47,4 +48,5 @@
       </div>
     </div>
   </div>
+  {{ end }} <!-- End if -->
 </div>

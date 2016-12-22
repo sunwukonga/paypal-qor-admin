@@ -1,0 +1,399 @@
+{{with .Result }}
+  <link type="text/css" rel="stylesheet" href="/vendors/flexslider.css" />
+  <link type="text/css" rel="stylesheet" href="/dist/home_products.css" />
+
+<!-- Move to /dist/buy_sample_box.css after testing -->
+<!-- Long term migrate to Elm -->
+<style>
+.sc-buybox-bg {
+    background: url('/images/SCBanner.jpg') no-repeat;
+    -webkit-background-size: 100% auto;
+    -moz-background-size: 100% auto;
+    -o-background-size: 100% auto;
+    background-size: 100% auto;
+    margin:0;
+    padding:0px;
+}
+</style>
+
+<div class="container">
+  <div class="row">
+	<div class="column column-12 sc-buybox-bg">
+		<div class="column column-4">&nbsp</div>
+
+	  <div class="column column-4">
+		<input type="image" style="padding-top:25%;padding-bottom:25%;padding-left:0;padding-right:0;width:100%" src="/images/samplebox.png" border="0" onclick="toggle_visibility('toggleMeSix')" />
+	  </div>
+
+	  <div class="column column-4">&nbsp</div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="column column-3">&nbsp</div>
+  <div class="column column-6">
+&nbsp
+    <div id="toggleMeSix" style='display:none;'>
+      <legend>Your Delivery Details</legend> 
+      <form class="well form-horizontal" action="" id="check_coupon_six">
+        <fieldset>
+
+		<div class="form-group">
+			<label class="col-md-4 control-label">Sample box price</label>
+			<span class="col-md-4 control-label" id="display-price">Select country for pricing!</span>
+		    <div class="col-md-4 inputGroupContainer">
+		      <div class="input-group">
+			  </div>
+			</div>
+		</div>
+
+		<div class="form-group">
+		  <label class="col-md-4 control-label">Country</label>  
+		  <div class="col-md-4 inputGroupContainer">
+		    <div class="input-group">
+		      <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+			  <select required onchange="change_country(this.value)">
+                <option value="">Select your country</option>
+                <option value="Singapore">Singapore</option>
+                <option value="Hong Kong">Hong Kong</option>
+                <option value="Philippines">Philippines</option>
+                <option value="Malaysia">Malaysia</option>
+                <option value="Indonesia">Indonesia</option>
+                <option value="Thailand">Thailand</option>
+                <option value="Australia">Australia</option>
+			  </select>
+		    </div>
+		  </div>
+		</div>
+
+		<!-- Warning message -->
+		<div class="alert alert-warning" role="alert" id="warning_message"><i class="glyphicon glyphicon-warning-sign"></i> The details below are sometimes our only means of contacting you. Please take particular care with the delivery phone number. 
+		</div>
+
+		<div class="form-group">
+		  <label class="col-md-4 control-label">First Name</label>  
+		  <div class="col-md-4 inputGroupContainer">
+		    <div class="input-group">
+		      <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+		      <input id="first_name_six" name="first_name" placeholder="First Name" class="form-control"  type="text">
+		    </div>
+		  </div>
+		</div>
+
+		<!-- Text input-->
+		<div class="form-group">
+		  <label class="col-md-4 control-label" >Last Name</label> 
+          <div class="col-md-4 inputGroupContainer">
+            <div class="input-group">
+		      <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+		      <input id="last_name_six" name="last_name" placeholder="Last Name" class="form-control"  type="text">
+			</div>
+		  </div>
+		</div>
+
+		<!-- Text input-->
+			   
+		<div class="form-group">
+		  <label class="col-md-4 control-label">Phone #</label>  
+			<div class="col-md-4 inputGroupContainer">
+			<div class="input-group">
+				<span class="input-group-addon"><i class="glyphicon glyphicon-earphone"></i></span>
+		  <input id="phone_six" name="phone" placeholder="+6588881212" class="form-control" type="text">
+			</div>
+			  <small class="form-text text-muted" style="" data-bv-validator="phone" data-bv-validator-for="phone">Please take particular care with this information.</small>
+		  </div>
+		</div>
+
+		<!-- Text input-->
+			  
+		<div class="form-group">
+		  <label class="col-md-4 control-label">Address</label>  
+			<div class="col-md-4 inputGroupContainer">
+			<div class="input-group">
+				<span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span>
+		  <input id="address_six" name="address" placeholder="Address" class="form-control" type="text">
+			</div>
+		  </div>
+		</div>
+
+		<!-- Text input-->
+		 
+		<div class="form-group">
+		  <label class="col-md-4 control-label">City</label>  
+			<div class="col-md-4 inputGroupContainer">
+			<div class="input-group">
+				<span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span>
+		  <input id="city_six" name="city" placeholder="city" class="form-control"  type="text">
+			</div>
+		  </div>
+		</div>
+
+		<!-- Text input-->
+
+		<div class="form-group">
+		  <label class="col-md-4 control-label">Zip Code</label>  
+			<div class="col-md-4 inputGroupContainer">
+			<div class="input-group">
+				<span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span>
+		  <input id="postcode_six" name="postcode" placeholder="Postcode" class="form-control"  type="text">
+			</div>
+			</div>
+		</div>
+
+		<!-- Button -->
+		<div class="form-group">
+		  <label class="col-md-4 control-label"></label>
+		  <div class="col-md-4">
+			<button type="submit" class="btn btn-warning" >Order<span class="glyphicon glyphicon-send"></span></button>
+		  </div>
+		</div>
+        </fieldset>
+      </form>
+    </div>
+  </div> <!-- End column-6 -->
+  <div class="column column-3">&nbsp</div>
+</div>
+
+<!-- 
+<form action="https://www.paypal.com/cgi-bin/webscr" id="payPalForm" method="post" target="_top">
+            <input type="hidden" name="business" value="leza@scbeautynetwork.com"> 
+--> 
+<form action="https://www.sandbox.paypal.com/cgi-bin/webscr" id="payPalForm" method="post" target="_top">
+            <input type="hidden" name="business" value="leza-facilitator@scbeautynetwork.com">
+            <input type="hidden" name="cmd" value="_xclick">
+            <input type="hidden" name="notify_url" value="http://notify.parker.sg/notify/">
+            <input type="hidden" name="return" value="http://notify.parker.sg">
+            <input type="hidden" name="cancel_return" value="http://notify.parker.sg">
+            <!-- currency_code set by JS script below --> 
+            <input type="hidden" name="currency_code" id="set_currency" value="">
+            <input type="hidden" name="item_name" id="set_item_name" value="">
+            <input type="hidden" name="custom" id="set_custom" value="">
+            <input type="hidden" name="quantity" value="1">
+            <input type="hidden" name="amount" id="set_amount" type="hidden" value="" />
+            <input type="hidden" name="cbt" value="Return to SC BEAUTY BOX">
+</form>
+
+<script>
+
+  function toggle_visibility(id) {
+    var e = document.getElementById(id);
+    if (e.style.display == 'block' || e.style.display=='') {
+      e.style.display = 'none';   
+    } else {
+      e.style.display = 'block';
+      //document.querySelector('#' + id).scrollIntoView({ 
+      e.scrollIntoView({ 
+        behavior: 'smooth' 
+      });
+    }
+  }
+
+  String.prototype.escapeSpecialChars = function() {
+    return this.replace(/\\n/g, "\\n")
+               .replace(/\\'/g, "\\'")
+               .replace(/\\"/g, '\\"')
+               .replace(/\\&/g, "\\&")
+               .replace(/\\r/g, "\\r")
+               .replace(/\\t/g, "\\t")
+               .replace(/\\b/g, "\\b")
+               .replace(/\\f/g, "\\f");
+  };
+
+  function change_country(val) {
+	switch(val) {
+      case "Singapore":
+        document.getElementById('set_currency').value = "SGD";
+        document.getElementById('set_item_name').value = 'SG Beauty Box Sample';
+        document.getElementById('set_amount').value = 32.85;
+        document.getElementById('display-price').innerHTML = "SGD $32.85";
+      break;		  
+      case "Hong Kong":
+        document.getElementById('set_currency').value = "HKD";
+        document.getElementById('set_item_name').value = 'HK Beauty Box Sample';
+        document.getElementById('set_amount').value = 220.50;
+        document.getElementById('display-price').innerHTML = "HKD $220.50";
+      break;		  
+      case "Philippines":
+        document.getElementById('set_currency').value = "PHP";
+        document.getElementById('set_item_name').value = 'PH Beauty Box Sample';
+        document.getElementById('set_amount').value = 1166;
+        document.getElementById('display-price').innerHTML = "PHP ₱1166";
+      break;		  
+      case "Malaysia":
+        document.getElementById('set_currency').value = "SGD";
+        document.getElementById('set_item_name').value = 'MY Beauty Box Sample';
+        document.getElementById('set_amount').value = 32.85;
+        document.getElementById('display-price').innerHTML = "SGD $32.85";
+      break;		  
+      case "Indonesia":
+        document.getElementById('set_currency').value = "SGD";
+        document.getElementById('set_item_name').value = 'ID Beauty Box Sample';
+        document.getElementById('set_amount').value = 32.85;
+        document.getElementById('display-price').innerHTML = "SGD $32.85";
+      break;		  
+      case "Thailand":
+        document.getElementById('set_currency').value = "THB";
+        document.getElementById('set_item_name').value = 'TH Beauty Box Sample';
+        document.getElementById('set_amount').value = 822;
+        document.getElementById('display-price').innerHTML = "THB ฿822";
+      break;		  
+      case "Australia":
+        document.getElementById('set_currency').value = "AUD";
+        document.getElementById('set_item_name').value = 'AUS Beauty Box Sample';
+        document.getElementById('set_amount').value = 33.40;
+        document.getElementById('display-price').innerHTML = "AUD $33.40";
+      break;		  
+    }
+  }
+
+  var codeSix;
+  var firstNameSix;
+  var lastNameSix;
+  var phoneSix;
+  var addressSix;
+  var citySix;
+  var postcodeSix;
+
+  var formSix = document.getElementById('check_coupon_six');
+  if (formSix.attachEvent) {
+    formSix.attachEvent("submit", callWithSix);
+  } else {
+    formSix.addEventListener("submit", callWithSix);
+  }
+
+// ----------------------
+// Six month functions
+// ----------------------
+  function callWithSix(e) {
+    if (e.preventDefault) e.preventDefault();
+
+    firstNameSix = document.getElementById("first_name_six").value.escapeSpecialChars();
+    lastNameSix = document.getElementById("last_name_six").value.escapeSpecialChars();
+    phoneSix = document.getElementById("phone_six").value.escapeSpecialChars();
+    addressSix = document.getElementById("address_six").value.escapeSpecialChars();
+    citySix = document.getElementById("city_six").value.escapeSpecialChars();
+    postcodeSix = document.getElementById("postcode_six").value.escapeSpecialChars();
+
+    // Post buy now on Sample box to Paypal
+	document.getElementById('set_custom').value = '{"influencer_id":"' +  {{ .CurrentUser.ID }} + '", "firstname":"' + firstNameSix + '", "lastname":"' + lastNameSix + '", "phone":"' + phoneSix + '", "address":"' + addressSix + '", "city":"' + citySix + '", "postcode":"' + postcodeSix + '"}';
+    document.getElementById('payPalForm').submit();
+    // You must return false to prevent the default form behavior
+    return false;
+  }
+
+</script>
+
+
+  <div class="container">
+    {{with .ColorVariation }}
+      <div class="products__details">
+        <div class="row">
+          <div class="column column-8 products__gallery">
+
+            <div class="swiper-container products__gallery--top">
+              <ul class="slides">
+                {{range $image := .Images.Files}}
+                  <li style="background-image:url({{$image.URL}})"></li>
+                {{end}}
+              </ul>
+            </div>
+
+            <div class="swiper-container products__gallery--thumbs">
+              <ul class="slides">
+                {{range $image := .Images.Files}}
+                  <li style="background-image:url({{$image.URL}})"></li>
+                {{end}}
+              </ul>
+            </div>
+          </div>
+
+          <div class="column column-4 products__meta">
+            <h1>{{.Product.Name}}</h1>
+            <p class="products__meta--price">${{.Product.Price}}</p>
+            <ul>
+              <li>
+                <strong>{{ t "product.color" }}</strong>
+                <span>{{.Color.Name}}</span>
+                <div class="products__meta--color">
+                  <span class="selected" style="background: #F6841C"></span>
+                  <span style="background: #25A5DF"></span>
+                  <span style="background: #80DA7A"></span>
+                  <span style="background: #FFD322"></span>
+                  <span style="background: #77969E"></span>
+                  <span style="background: #2F2F2F"></span>
+                </div>
+              </li>
+
+              <li>
+                <strong>{{ t "product.size" }}</strong>
+                <select class="" name="domains">
+                  {{range .SizeVariations}}
+                    <option value="{{.Size.ID}}">{{.Size.Name}}</option>
+                  {{end}}
+                </select>
+                <a href="#">{{ t "product.size_guide" }}</a>
+              </li>
+
+              <li>
+                <strong>{{ t "product.quantity" }}</strong>
+                <div class="products__meta--qty">
+                  <a href="#" class="reduce">-</a>
+                  <a href="#" class="add">+</a>
+                  <input type="text" class="qty" />
+                </div>
+              </li>
+              <li>
+			  <!--
+			    <a href="/addtocart/{{ .Product.ID }}" class="button button__primary">+ {{ t "product.add_to_cart" }}</a>
+                <button type="submit" class="button button__primary">+ {{ t "product.add_to_cart" }}</button>
+				-->
+			    <form method="post" action="/addtocart/{{ .Product.ID }}">
+			      <button type="submit" class="button button__primary">+ {{ t "product.add_to_cart" }}</button>
+			    </form>
+              </li>
+            </ul>
+            <div class="products__details--share">
+              <a href="#"><img src="/images/icon-fav.png" height="24px" /> <span>{{ t "product.add_to_wishlist" }}</span></a>
+              <div>
+                <span>{{ t "product.share" }}</span>
+                <a href="#"><img src="/images/facebook-grey.png" height="24px" /></a>
+                <a href="#"><img src="/images/twitter-grey.png" height="24px" /></a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row products__info">
+
+          <div class="column column-4">
+            <h6>{{ t "product.description" }}</h6>
+            <p>{{raw .Product.Description}}</p>
+          </div>
+
+          <div class="column column-4">
+            <h6>{{ t "product.specs" }}</h6>
+            <div>
+              <label>{{ t "product.made_in" }}</label>
+              <p>{{.Product.MadeCountry}}</p>
+            </div>
+            <div>
+              <label>{{ t "product.materials" }}</label>
+              <p>Rubber soles, fabric uppers, plastic & metal zipper</p>
+            </div>
+          </div>
+
+          <div class="column column-4">
+            <div>
+              <label>{{ t "product.framistan" }}</label>
+              <p>Me non paenitet nullum festiviorem excogitasse ad hoc. Etiam habebis sem dicantur magna mollis euismod.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    {{end}}
+
+  </div>
+
+  <script src="/vendors/jquery.flexslider-min.js"></script>
+{{end}}
+

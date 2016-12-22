@@ -46,6 +46,9 @@ func Router() *http.ServeMux {
 		router.GET("/couponcode/:code", controllers.CodeExists)
 		router.POST("/notify", controllers.IpnReceiver)
 
+		//Route for influencer to buy sample box
+		router.GET("/influencer/buysamplebox", controllers.BuySampleBox)
+
 		rootMux = http.NewServeMux()
 		rootMux.Handle("/auth/", auth.Auth.NewRouter())
 		publicDir := http.Dir(strings.Join([]string{config.Root, "public"}, "/"))

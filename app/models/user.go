@@ -42,6 +42,9 @@ type InfluencerCoupon struct {
 	Code   string
 	User   User
 	UserID uint
+
+	// Active if they have paid for a box
+	Active bool
 }
 
 func (user User) DisplayName() string {

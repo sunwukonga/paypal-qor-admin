@@ -14,8 +14,10 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/gorm"
 	"github.com/sunwukonga/paypal-qor-admin/app/models"
 	"github.com/sunwukonga/paypal-qor-admin/config"
+	myutils "github.com/sunwukonga/paypal-qor-admin/utils"
 )
 
 const (
@@ -24,6 +26,7 @@ const (
 )
 
 var IPNLogger *log.Logger
+var resp *http.Response
 
 func IpnReceiver(ctx *gin.Context) {
 	//func IpnReceiver(w http.ResponseWriter, r *http.Request) {
@@ -59,8 +62,16 @@ func IpnReceiver(ctx *gin.Context) {
 	body, _ := ioutil.ReadAll(ctx.Request.Body)
 	// Prepend POST body with required field
 	body = append([]byte("cmd=_notify-validate&"), body...)
+	IPNLogger.Println("-----------------------------------Pre-Begin---------------------------------------")
+	IPNLogger.Println(string(body))
+	IPNLogger.Println("-----------------------------------------------------------------------------------")
 	// Make POST request to paypal
-	resp, _ := http.Post(paypalURL, contentType, bytes.NewBuffer(body))
+	if bytes.Contains(body, []byte("test_ipn")) {
+		//Temporary work around.
+		resp, _ = http.Post(urlSimulator, contentType, bytes.NewBuffer(body))
+	} else {
+		resp, _ = http.Post(paypalURL, contentType, bytes.NewBuffer(body))
+	}
 
 	// *********************************************************
 	// HANDSHAKE STEP 3 -- Read response for VERIFIED or INVALID
@@ -91,7 +102,10 @@ func IpnReceiver(ctx *gin.Context) {
 			IPNLogger.Println("******************************************************************************")
 			IPNLogger.Printf("WARNING: We have received a TEST IPN from paypal in Production Mode, ignoring!")
 			IPNLogger.Println("******************************************************************************")
-			return
+
+			IPNLogger.Println("**Temporarily allowing tests through Warning!************************************")
+
+			//	return
 		} else {
 			// Carry on, TEST IPN received into testing environment.
 		}
@@ -121,6 +135,9 @@ func IpnReceiver(ctx *gin.Context) {
 	if len(values["subscr_id"]) > 0 {
 		if err := DB(ctx).Where("subscr_id = ?", values["subscr_id"][0]).First(subscription).Error; err != nil {
 			// Not found or something more serious...
+			IPNLogger.Println("**********************************************************************")
+			IPNLogger.Println("Error, getting Subscription:", err.Error())
+			IPNLogger.Println("**********************************************************************")
 		}
 	}
 
@@ -178,9 +195,17 @@ func IpnReceiver(ctx *gin.Context) {
 				subscription.EotAt = eotAt
 				paypalPayment := models.PaypalPayment{}
 				if err := DB(ctx).Where("subscr_id = ?", subscription.SubscrID).Model(&paypalPayment); err == nil {
-					models.SubscriptionState.Trigger(models.EventSignup, subscription, DB(ctx))
+					if eventErr := models.SubscriptionState.Trigger(models.EventSignup, subscription, DB(ctx)); eventErr != nil {
+						IPNLogger.Println("**********************************************************************")
+						IPNLogger.Println("Error, EventSignup:", eventErr.Error())
+						IPNLogger.Println("**********************************************************************")
+					}
 				} else {
-					models.SubscriptionState.Trigger(models.EventSignunpaid, subscription, DB(ctx))
+					if eventErr := models.SubscriptionState.Trigger(models.EventSignunpaid, subscription, DB(ctx)); eventErr != nil {
+						IPNLogger.Println("**********************************************************************")
+						IPNLogger.Println("Error, EventSignunpaid:", eventErr.Error())
+						IPNLogger.Println("**********************************************************************")
+					}
 				}
 
 				//DB(ctx).Create(subscription)
@@ -225,6 +250,8 @@ func IpnReceiver(ctx *gin.Context) {
 						DB(ctx).Create(paypalPayment)
 						if len(subscription.SubscrID) > 0 {
 							// Subscription already exists, our state machine is in known state. We can call Trigger.
+
+							IPNLogger.Printf("WARNING(IpnReceiver): Calling Trigger for payment from state: %v", subscription.State)
 							models.SubscriptionState.Trigger(models.EventPayment, subscription, DB(ctx))
 						}
 
@@ -313,6 +340,36 @@ func IpnReceiver(ctx *gin.Context) {
 			IPNLogger.Println("**********************************************************************")
 			IPNLogger.Printf("WARNING(IpnReceiver): Subscription modify sent, but we don't accept them")
 			IPNLogger.Println("**********************************************************************")
+		case "web_accept":
+			IPNLogger.Println("### WEB ACCEPT ###")
+			if len(values["payment_status"]) > 0 {
+				influencerCoupon := &models.InfluencerCoupon{}
+				influencerID, _ := strconv.Atoi(custom["influencer_id"])
+				influencerCoupon.UserID = uint(influencerID)
+				searchCoupon := &models.InfluencerCoupon{}
+				if values["payment_status"][0] == "Completed" {
+
+					// Generate unique influencer code
+					influencerCoupon.Code = string(myutils.GenRandAlpNum(6))
+					var record *gorm.DB
+					for record = DB(ctx).Where("code = ?", influencerCoupon.Code).First(searchCoupon); record.RecordNotFound() != true; influencerCoupon.Code = string(myutils.GenRandAlpNum(6)) {
+						// Someone has this code already, try again
+						record = DB(ctx).Model(searchCoupon).Where("code = ?", influencerCoupon.Code)
+					}
+					influencerCoupon.Active = true
+					// Create the influencer coupon with "UserID", "Active" and "Code" fields
+					DB(ctx).Create(influencerCoupon)
+					// Set delivery Address?
+					// Create Order
+				} else if values["payment_status"][0] == "Reversed" || values["payment_status"][0] == "Refunded" {
+					// Get coupon if it exists, and then de-activate influencer.
+					if record := DB(ctx).Where("user_id = ?", influencerCoupon.UserID).First(influencerCoupon); record.RecordNotFound() != true {
+						DB(ctx).Model(influencerCoupon).Update("active", false)
+					}
+
+				}
+			}
+
 		case "send_money":
 			IPNLogger.Println("**********************************************************************")
 			IPNLogger.Println("### SEND MONEY ###")
@@ -325,14 +382,14 @@ func IpnReceiver(ctx *gin.Context) {
 		} // End switch
 	} // End test for txn_type
 
-	// Check for Payment Reversed.
+	// Check for Payment Reversed or Refunded.
 	if len(values["payment_status"]) > 0 {
-		if values["payment_status"][0] == "Reversed" {
+		if values["payment_status"][0] == "Reversed" || values["payment_status"][0] == "Refunded" {
 			// Update parent Txn values["parent_txn_id"][0] with Status -> Reversed
 			paypalPayment = &models.PaypalPayment{}
 			if len(values["parent_txn_id"]) > 0 {
 				if err := DB(ctx).Where("txn_id = ?", values["parent_txn_id"][0]).First(paypalPayment).Error; err == nil {
-					DB(ctx).Model(paypalPayment).Update("payment_status", "Reversed")
+					DB(ctx).Model(paypalPayment).Update("payment_status", values["payment_status"][0])
 				}
 			}
 			// Update subscription values["subscr_id"][0] with End Date -> n * months + start date

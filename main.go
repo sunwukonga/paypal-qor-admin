@@ -8,8 +8,10 @@ import (
 	"strings"
 
 	"github.com/gorilla/csrf"
+	qoradmin "github.com/qor/admin"
 	"github.com/qor/qor/utils"
 	"github.com/sunwukonga/paypal-qor-admin/app/controllers"
+	"github.com/sunwukonga/paypal-qor-admin/app/models"
 	"github.com/sunwukonga/paypal-qor-admin/config"
 	"github.com/sunwukonga/paypal-qor-admin/config/admin"
 	"github.com/sunwukonga/paypal-qor-admin/config/api"
@@ -21,6 +23,28 @@ import (
 func main() {
 	mux := http.NewServeMux()
 	mux.Handle("/", routes.Router())
+
+	admin.Admin.GetRouter().Use(&qoradmin.Middleware{
+		Name: "influencerAuth",
+		Handler: func(context *qoradmin.Context, middleware *qoradmin.Middleware) {
+			user := context.CurrentUser.(*models.User)
+			if user.Role != models.RoleInfluencer {
+				middleware.Next(context)
+				return
+			} else {
+				influencerCoupon := &models.InfluencerCoupon{}
+				if err := context.DB.Where("user_id = ?", user.ID).First(influencerCoupon).Error; err == nil {
+					if influencerCoupon.Active {
+						middleware.Next(context)
+						return
+					}
+				}
+				// redirect to box order route.
+				http.Redirect(context.Writer, context.Request, "/influencer/buysamplebox", http.StatusSeeOther)
+				return
+			}
+		},
+	})
 	admin.Admin.MountTo("/admin", mux)
 	admin.Widgets.WidgetSettingResource.IndexAttrs("Name")
 

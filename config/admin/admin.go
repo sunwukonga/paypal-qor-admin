@@ -703,25 +703,9 @@ func init() {
 				// Insert code into database.
 				influencerCoupon := &models.InfluencerCoupon{}
 				if err := tx.Where("user_id = ?", user.ID).First(influencerCoupon).Error; err != nil {
-					//Inspect error. Hopefully, that it wasn't found.
-					// Create Coupon
-					/*
-						n := 6
-						b := make([]byte, n)
-						// http://stackoverflow.com/questions/22892120/how-to-generate-a-random-string-of-a-fixed-length-in-golang
-						for i, cache, remain := n-1, src.Int63(), letterIdxMax; i >= 0; {
-							if remain == 0 {
-								cache, remain = src.Int63(), letterIdxMax
-							}
-							if idx := int(cache & letterIdxMask); idx < len(letterBytes) {
-								b[i] = letterBytes[idx]
-								i--
-							}
-							cache >>= letterIdxBits
-							remain--
-						} */
 
 					influencerCoupon.Code = string(myutils.GenRandAlpNum(6))
+
 					influencerCoupon.UserID = user.ID
 					// Not sure if I should be doing this. Probably don't need to.
 					influencerCoupon.User = *user

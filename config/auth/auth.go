@@ -74,8 +74,9 @@ func CurrentLocale(req *http.Request) string {
 
 func layoutData(w http.ResponseWriter, r *http.Request) authboss.HTMLData {
 	return authboss.HTMLData{
-		"CustomerRole": models.RoleCustomer,
-		"UserRoleKey":  "role",
+		"CustomerRole":   models.RoleCustomer,
+		"InfluencerRole": models.RoleInfluencer,
+		"UserRoleKey":    "role",
 		"Result": authboss.HTMLData{
 			"CurrentLocale": CurrentLocale(r),
 		},

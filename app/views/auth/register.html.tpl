@@ -25,7 +25,7 @@
 					    <li><button type="submit" class="button button__primary">{{ t "register.button" }}</button></li>
 
 						<input type="hidden" name="{{.xsrfName}}" value="{{.xsrfToken}}" />
-						<input type="hidden" name="{{.UserRoleKey}}" type="text" value="{{.CustomerRole}}" />
+						<input type="hidden" name="{{.UserRoleKey}}" type="text" value="{{.InfluencerRole}}" />
 					</ul>
 				</form>
 			</div>

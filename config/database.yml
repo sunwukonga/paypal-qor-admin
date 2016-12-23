@@ -1,7 +1,0 @@
-db:
-  adapter: mysql
-  host: notify-bbox.ceokwxpyjnih.ap-southeast-1.rds.amazonaws.com
-  port: 3306
-  name: bbox_backend
-  user: boxingday
-  password: whenwhiterabbitsattack

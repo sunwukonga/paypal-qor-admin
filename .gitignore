@@ -46,6 +46,14 @@ public/microsites/*
 vendor/*
 .DS_Store
 
+# Sensitive Config files
+config/database.yml
+config/smtp.yml
+
 # Commit Message
 message
 main
+main1
+main2
+ipn.log
+ipndebug

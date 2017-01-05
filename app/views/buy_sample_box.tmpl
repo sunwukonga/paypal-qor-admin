@@ -200,6 +200,7 @@
   };
 
   function change_country(val) {
+	countrySix = val;
 	switch(val) {
       case "Singapore":
         document.getElementById('set_currency').value = "SGD";
@@ -252,6 +253,7 @@
   var phoneSix;
   var addressSix;
   var citySix;
+  var countrySix;
   var postcodeSix;
 
   var formSix = document.getElementById('check_coupon_six');
@@ -275,7 +277,7 @@
     postcodeSix = document.getElementById("postcode_six").value.escapeSpecialChars();
 
     // Post buy now on Sample box to Paypal
-	document.getElementById('set_custom').value = '{"influencer_id":"' +  {{ .CurrentUser.ID }} + '", "firstname":"' + firstNameSix + '", "lastname":"' + lastNameSix + '", "phone":"' + phoneSix + '", "address":"' + addressSix + '", "city":"' + citySix + '", "postcode":"' + postcodeSix + '"}';
+	document.getElementById('set_custom').value = '{"influencer_id":"' +  {{ .CurrentUser.ID }} + '", "firstname":"' + firstNameSix + '", "lastname":"' + lastNameSix + '", "phone":"' + phoneSix + '", "address":"' + addressSix + '", "city":"' + citySix + '", "postcode":"' + postcodeSix + '", "country":"' + countrySix + '"}';
     document.getElementById('payPalForm').submit();
     // You must return false to prevent the default form behavior
     return false;

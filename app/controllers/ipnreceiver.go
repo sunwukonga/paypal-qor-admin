@@ -121,6 +121,7 @@ func IpnReceiver(ctx *gin.Context) {
 		}
 	}
 	// Grab custom data
+	// These fields are currently determined by the frontend JS that populates it.
 	custom := map[string]string{}
 	if len(values["custom"]) > 0 {
 		if err := json.Unmarshal([]byte(values["custom"][0]), &custom); err != nil {
@@ -360,7 +361,31 @@ func IpnReceiver(ctx *gin.Context) {
 					// Create the influencer coupon with "UserID", "Active" and "Code" fields
 					DB(ctx).Create(influencerCoupon)
 					// Set delivery Address?
+					influencerId, _ := strconv.Atoi(custom["influencer_id"])
+					address := models.Address{
+						UserID:      uint(influencerId),
+						ContactName: custom["firstname"] + " " + custom["lastname"],
+						Phone:       custom["phone"],
+						Country:     custom["country"],
+						City:        custom["city"],
+						Address1:    custom["address"],
+						Postcode:    custom["postcode"],
+					}
+					DB(ctx).Create(&address)
+
+					/*
+						custom["coupon"]
+						custom["influencer_id"]
+						custom["firstname"]
+						custom["lastname"]
+						custom["phone"]
+						custom["address"]
+						custom["city"]
+						custom["postcode"]
+					*/
+
 					// Create Order
+
 				} else if values["payment_status"][0] == "Reversed" || values["payment_status"][0] == "Refunded" {
 					// Get coupon if it exists, and then de-activate influencer.
 					if record := DB(ctx).Where("user_id = ?", influencerCoupon.UserID).First(influencerCoupon); record.RecordNotFound() != true {

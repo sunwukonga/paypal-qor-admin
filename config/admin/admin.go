@@ -828,27 +828,6 @@ func init() {
 					u.Password = string(bcryptPassword)
 				}
 			}
-			// Piggyback here to auto-fill the InfluencerCode field
-			// Should only run if this code does not already exist.
-			/*
-				n := 6
-				if len(u.InfluencerCode) != n {
-					b := make([]byte, n)
-					// http://stackoverflow.com/questions/22892120/how-to-generate-a-random-string-of-a-fixed-length-in-golang
-					for i, cache, remain := n-1, src.Int63(), letterIdxMax; i >= 0; {
-						if remain == 0 {
-							cache, remain = src.Int63(), letterIdxMax
-						}
-						if idx := int(cache & letterIdxMask); idx < len(letterBytes) {
-							b[i] = letterBytes[idx]
-							i--
-						}
-						cache >>= letterIdxBits
-						remain--
-					}
-					u.InfluencerCode = string(b)
-				}
-			*/
 		},
 	})
 	user.Meta(&admin.Meta{Name: "InfluencerCode",

@@ -675,7 +675,7 @@ func init() {
 	)
 
 	// Add User
-	user := Admin.AddResource(&models.User{}, &admin.Config{Menu: []string{"User Management"}, Permission: roles.Deny(roles.CRUD, models.RoleSubscriber)})
+	user := Admin.AddResource(&models.User{}, &admin.Config{Menu: []string{"User Management"}, Permission: roles.Deny(roles.CRUD, models.RoleSubscriber).Deny(roles.Create, models.RoleInfluencer)})
 	user.GetAction("Delete").Permission = roles.Allow(roles.Delete, models.RoleAdmin, models.RoleServicer)
 	user.Scope(&admin.Scope{
 		Name: "Users",

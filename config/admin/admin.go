@@ -675,7 +675,7 @@ func init() {
 	)
 
 	// Add User
-	user := Admin.AddResource(&models.User{}, &admin.Config{Menu: []string{"User Management"}, Permission: roles.Deny(roles.CRUD, models.RoleSubscriber).Deny(roles.Create, models.RoleInfluencer)})
+	user := Admin.AddResource(&models.User{}, &admin.Config{Menu: []string{"User Management"}, Permission: roles.Deny(roles.CRUD, models.RoleSubscriber, models.RoleInfluencer)})
 	user.GetAction("Delete").Permission = roles.Allow(roles.Delete, models.RoleAdmin, models.RoleServicer)
 	user.Scope(&admin.Scope{
 		Name: "Users",
@@ -889,6 +889,97 @@ func init() {
 		"Addresses",
 	)
 	user.EditAttrs(user.NewAttrs())
+
+	// Add InfluencerDetails
+	influencerDetails := Admin.AddResource(&models.User{}, &admin.Config{Name: "Your Detail", Params: "profile", Menu: []string{"My Management"}, Permission: roles.Allow(roles.CRUD, models.RoleInfluencer).Deny(roles.Create, models.RoleInfluencer)})
+	//Admin.AddMenu(&admin.Menu{Name: "Your Profile", Link: "/admin/users/43", Ancestors: []string{"My Management"}})
+	//	Menu: []string{"My Management"}, Permission: roles.Allow(roles.CRUD, models.RoleInfluencer).Deny(roles.Create, models.RoleInfluencer)})
+	//	Menu: []string{"My Management"}, Link: "/profile", Permission: roles.Allow(roles.CRUD, models.RoleInfluencer).Deny(roles.Create, models.RoleInfluencer)})
+	influencerDetails.GetAction("Delete").Permission = roles.Allow(roles.Delete, models.RoleAdmin, models.RoleServicer)
+	//influencerDetails.SetParams("profile")
+	influencerDetails.Scope(&admin.Scope{
+		Name: "Profile",
+		Handle: func(db *gorm.DB, context *qor.Context) *gorm.DB {
+			currentUser := context.CurrentUser.(*models.User)
+			if currentUser.Role == models.RoleInfluencer {
+				return db.Where("id = ?", currentUser.ID)
+			} else {
+				return db
+			}
+		},
+		Default: true,
+	})
+
+	influencerDetails.Meta(&admin.Meta{Name: "Gender", Config: &admin.SelectOneConfig{Collection: []string{"Male", "Female", "Unknown"}}})
+	influencerDetails.Meta(&admin.Meta{Name: "Role", Config: &admin.SelectOneConfig{Collection: models.Roles}})
+	influencerDetails.Meta(&admin.Meta{Name: "Password",
+		Type:            "password",
+		FormattedValuer: func(interface{}, *qor.Context) interface{} { return "" },
+		Setter: func(resource interface{}, metaValue *resource.MetaValue, context *qor.Context) {
+			values := metaValue.Value.([]string)
+			u := resource.(*models.User)
+			if len(values) > 0 {
+				if newPassword := values[0]; newPassword != "" {
+					bcryptPassword, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
+					if err != nil {
+						context.DB.AddError(validations.NewError(user, "Password", "Can't encrpt password"))
+						return
+					}
+					u.Password = string(bcryptPassword)
+				}
+			}
+		},
+	})
+	influencerDetails.Meta(&admin.Meta{Name: "InfluencerCode",
+		Label: "Influencer Code",
+		Type:  "readonly",
+		Valuer: func(record interface{}, context *qor.Context) interface{} {
+			influencerCoupon := &models.InfluencerCoupon{}
+			user := record.(*models.User)
+			if err := context.GetDB().Where("user_id = ?", user.ID).First(influencerCoupon).Error; err != nil {
+				if err.Error() == "record not found" {
+					return ""
+				} else {
+					// Ooops, we found a real error
+					fmt.Println("Error fetching coupon: ", err.Error())
+					return ""
+				}
+			} else {
+				return influencerCoupon.Code
+			}
+		},
+	})
+	influencerDetails.Meta(&admin.Meta{Name: "Confirmed", Valuer: func(user interface{}, ctx *qor.Context) interface{} {
+		if user.(*models.User).ID == 0 {
+			return true
+		}
+		return user.(*models.User).Confirmed
+	}})
+
+	influencerDetails.IndexAttrs("ID", "Name", "Email", "InfluencerCode")
+	influencerDetails.ShowAttrs(
+		&admin.Section{
+			Title: "Basic Information",
+			Rows: [][]string{
+				{"Name"},
+				{"Email", "Password"},
+				{"Gender", "Role"},
+				{"InfluencerCode"},
+				{"Confirmed"},
+			}},
+		"Addresses",
+	)
+	influencerDetails.EditAttrs(
+		&admin.Section{
+			Title: "Your Information",
+			Rows: [][]string{
+				{"Name"},
+				{"Email", "Password"},
+				{"Gender", "Role"},
+				{"Confirmed"},
+			}},
+		"Addresses",
+	)
 
 	// Add Store
 	store := Admin.AddResource(&models.Store{}, &admin.Config{Menu: []string{"Store Management"}, Permission: roles.Deny(roles.CRUD, models.RoleServicer, models.RoleInfluencer, models.RoleSubscriber)})

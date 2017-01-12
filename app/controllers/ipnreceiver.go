@@ -227,15 +227,27 @@ func IpnReceiver(ctx *gin.Context) {
 							paypalPayer.User.Name = sql.NullString{String: values["first_name"][0] + values["last_name"][0], Valid: true}
 							paypalPayer.User.Role = models.RoleSubscriber
 							paypalPayer.User.Confirmed = true
-							paypalPayer.User.Addresses = []models.Address{
-								models.Address{
-									ContactName: paypalPayer.User.Name.String,
-									Country:     values["address_country"][0],
-									City:        values["address_city"][0],
-									Address1:    values["address_street"][0],
-									Postcode:    values["address_zip"][0],
-								},
+							if len(values["address_country"]) > 0 {
+								paypalPayer.User.Addresses = []models.Address{
+									models.Address{
+										ContactName: paypalPayer.User.Name.String,
+										Country:     values["address_country"][0],
+										City:        values["address_city"][0],
+										Address1:    values["address_street"][0],
+										Postcode:    values["address_zip"][0],
+									},
+								}
+							} else {
+								paypalPayer.User.Addresses = []models.Address{
+									models.Address{
+										ContactName: paypalPayer.User.Name.String,
+										City:        values["address_city"][0],
+										Address1:    values["address_street"][0],
+										Postcode:    values["address_zip"][0],
+									},
+								}
 							}
+
 							DB(ctx).Create(paypalPayer)
 						}
 						// Create new PaypalPayment

@@ -892,7 +892,7 @@ func init() {
 
 	// Add InfluencerDetails
 	influencerDetails := Admin.AddResource(&models.User{}, &admin.Config{Name: "Your Detail", Params: "profile", Menu: []string{"My Management"}, Permission: roles.Allow(roles.CRUD, models.RoleInfluencer).Deny(roles.Create, models.RoleInfluencer)})
-	//Admin.AddMenu(&admin.Menu{Name: "Your Profile", Link: "/admin/users/43", Ancestors: []string{"My Management"}})
+	//Admin.AddMenu(&admin.Menu{Name: "Your Profile", Link: "/admin/profile/{{.CurrentUser}}", Ancestors: []string{"My Management"}})
 	//	Menu: []string{"My Management"}, Permission: roles.Allow(roles.CRUD, models.RoleInfluencer).Deny(roles.Create, models.RoleInfluencer)})
 	//	Menu: []string{"My Management"}, Link: "/profile", Permission: roles.Allow(roles.CRUD, models.RoleInfluencer).Deny(roles.Create, models.RoleInfluencer)})
 	influencerDetails.GetAction("Delete").Permission = roles.Allow(roles.Delete, models.RoleAdmin, models.RoleServicer)
@@ -959,13 +959,12 @@ func init() {
 	influencerDetails.IndexAttrs("ID", "Name", "Email", "InfluencerCode")
 	influencerDetails.ShowAttrs(
 		&admin.Section{
-			Title: "Basic Information",
+			Title: "Your Information",
 			Rows: [][]string{
 				{"Name"},
 				{"Email", "Password"},
 				{"Gender", "Role"},
 				{"InfluencerCode"},
-				{"Confirmed"},
 			}},
 		"Addresses",
 	)
@@ -975,8 +974,7 @@ func init() {
 			Rows: [][]string{
 				{"Name"},
 				{"Email", "Password"},
-				{"Gender", "Role"},
-				{"Confirmed"},
+				{"Gender"},
 			}},
 		"Addresses",
 	)

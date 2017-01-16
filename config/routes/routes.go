@@ -48,6 +48,7 @@ func Router() *http.ServeMux {
 
 		//Route for influencer to buy sample box
 		router.GET("/influencer/buysamplebox", controllers.BuySampleBox)
+		router.GET("/buyboxsubscription", controllers.BuyBoxSubscription)
 
 		rootMux = http.NewServeMux()
 		rootMux.Handle("/auth/", auth.Auth.NewRouter())

@@ -1,0 +1,613 @@
+{{with .Result }}
+  <link type="text/css" rel="stylesheet" href="/vendors/flexslider.css" />
+  <link type="text/css" rel="stylesheet" href="/dist/home_products.css" />
+
+<!-- Move to /dist/buy_sample_box.css after testing -->
+<!-- Long term migrate to Elm -->
+<style>
+.sc-buybox-bg {
+    background: url('http://j.b5z.net/i/u/10242520/i/subscription/SC_Banner.jpg') no-repeat;
+    -webkit-background-size: 100% auto;
+    -moz-background-size: 100% auto;
+    -o-background-size: 100% auto;
+    background-size: 100% auto;
+    margin:0;
+    padding:0px;
+}
+</style>
+
+<div class="container">
+  <div class="row">
+	<div class="column column-12 sc-buybox-bg">
+	  <div class="column column-1">&nbsp</div>
+
+	  <div class="column column-4">
+		<input type="image" style="padding-top:25%;padding-bottom:25%;padding-left:0;padding-right:0;width:100%" src="http://j.b5z.net/i/u/10242520/i/subscription/Web_HK_6mths.png" border="0" onclick="toggle_visibility('toggleMeSix')" />
+	  </div>
+
+	  <div class="column column-2">&nbsp</div>
+
+	  <div class="column column-4">
+		<input type="image" style="padding-top:25%;padding-bottom:25%;padding-left:0;padding-right:0;width:100%" src="http://j.b5z.net/i/u/10242520/i/subscription/Web_HK_12mths.png" border="0" onclick="toggle_visibility('toggleMeTwelve')" />
+	  </div>
+
+	  <div class="column column-1">&nbsp</div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="column column-6">
+&nbsp
+    <div id="toggleMeSix" style='display:none;'>
+      <legend>Box Recipient Details (6 month term)</legend> 
+      <form class="well form-horizontal" action="" id="check_coupon_six">
+        <fieldset>
+        <div class="form-group">
+	      <label class="col-md-4 control-label">Coupon Code</label>  
+	      <div class="col-md-4 inputGroupContainer">
+		    <div class="input-group">
+		      <span class="input-group-addon"><i class="glyphicon glyphicon-barcode"></i></span>
+		      <input id="coupon_input_six" name="couponSix" placeholder="XXXXXX" maxlength="6" pattern="[A-Z\d]*" class="form-control"  type="text">
+		    </div>
+		    <small class="form-text text-muted" style="" data-bv-validator="phone" data-bv-validator-for="phone">VALID coupon or empty.</small>
+		  </div>
+		</div>
+
+		<!-- Warning message -->
+		<div class="alert alert-warning" role="alert" id="warning_message"><i class="glyphicon glyphicon-warning-sign"></i> The details below are for the <b>receiver</b> of the box. Please take particular care with the delivery Phone number. 
+		</div>
+
+		<div class="form-group">
+		  <label class="col-md-4 control-label">First Name</label>  
+		  <div class="col-md-4 inputGroupContainer">
+		    <div class="input-group">
+		      <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+		      <input id="first_name_six" name="first_name" placeholder="First Name" class="form-control"  type="text">
+		    </div>
+		  </div>
+		</div>
+
+		<!-- Text input-->
+		<div class="form-group">
+		  <label class="col-md-4 control-label" >Last Name</label> 
+          <div class="col-md-4 inputGroupContainer">
+            <div class="input-group">
+		      <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+		      <input id="last_name_six" name="last_name" placeholder="Last Name" class="form-control"  type="text">
+			</div>
+		  </div>
+		</div>
+
+		<!-- Text input-->
+			   
+		<div class="form-group">
+		  <label class="col-md-4 control-label">Phone #</label>  
+			<div class="col-md-4 inputGroupContainer">
+			<div class="input-group">
+				<span class="input-group-addon"><i class="glyphicon glyphicon-earphone"></i></span>
+		  <input id="phone_six" name="phone" placeholder="+6588881212" class="form-control" type="text">
+			</div>
+			  <small class="form-text text-muted" style="" data-bv-validator="phone" data-bv-validator-for="phone">This is our ONLY way to contact the recipient.</small>
+		  </div>
+		</div>
+
+		<!-- Text input-->
+			  
+		<div class="form-group">
+		  <label class="col-md-4 control-label">Address</label>  
+			<div class="col-md-4 inputGroupContainer">
+			<div class="input-group">
+				<span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span>
+		  <input id="address_six" name="address" placeholder="Address" class="form-control" type="text">
+			</div>
+		  </div>
+		</div>
+
+		<!-- Text input-->
+		 
+		<div class="form-group">
+		  <label class="col-md-4 control-label">City</label>  
+			<div class="col-md-4 inputGroupContainer">
+			<div class="input-group">
+				<span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span>
+		  <input id="city_six" name="city" placeholder="city" class="form-control"  type="text">
+			</div>
+		  </div>
+		</div>
+
+		<!-- Text input-->
+
+		<div class="form-group">
+		  <label class="col-md-4 control-label">Zip Code</label>  
+			<div class="col-md-4 inputGroupContainer">
+			<div class="input-group">
+				<span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span>
+		  <input id="postcode_six" name="postcode" placeholder="Postcode" class="form-control"  type="text">
+			</div>
+			</div>
+		</div>
+
+		<!-- Button -->
+		<div class="form-group">
+		  <label class="col-md-4 control-label"></label>
+		  <div class="col-md-4">
+			<button type="submit" class="btn btn-warning" >Subscribe<span class="glyphicon glyphicon-send"></span></button>
+		  </div>
+		</div>
+        </fieldset>
+      </form>
+    </div>
+  </div> <!-- End first column-6 -->
+  <div class="column column-6">
+&nbsp
+<div id="toggleMeTwelve" style='display:none;'>
+
+<legend>Box Recipient Details (12 month term)</legend> 
+
+
+<form class="well form-horizontal" action="" id="check_coupon_twelve">
+<fieldset>
+
+<div class="form-group">
+  <label class="col-md-4 control-label">Coupon Code</label>  
+  <div class="col-md-4 inputGroupContainer">
+  <div class="input-group">
+  <span class="input-group-addon"><i class="glyphicon glyphicon-barcode"></i></span>
+  <input id="coupon_input_twelve" name="couponTwelve" placeholder="XXXXXX" maxlength="6" pattern="[A-Z\d]*" class="form-control"  type="text">
+  </div>
+  <small class="form-text text-muted" style="" data-bv-validator="phone" data-bv-validator-for="phone">VALID coupon or empty.</small>
+  </div>
+</div>
+
+<!-- Warning message -->
+<div class="alert alert-warning" role="alert" id="warning_message_twelve"><i class="glyphicon glyphicon-warning-sign"></i> The details below are for the <b>receiver</b> of the box. Please take particular care with the delivery Phone number. 
+</div>
+
+<div class="form-group">
+  <label class="col-md-4 control-label">First Name</label>  
+  <div class="col-md-4 inputGroupContainer">
+  <div class="input-group">
+  <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+  <input id="first_name_twelve" name="first_name" placeholder="First Name" class="form-control" type="text">
+    </div>
+  </div>
+</div>
+
+<!-- Text input-->
+
+<div class="form-group">
+  <label class="col-md-4 control-label" >Last Name</label> 
+    <div class="col-md-4 inputGroupContainer">
+    <div class="input-group">
+  <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+  <input id="last_name_twelve" name="last_name" placeholder="Last Name" class="form-control"  type="text">
+    </div>
+  </div>
+</div>
+
+<!-- Text input-->
+       
+<div class="form-group">
+  <label class="col-md-4 control-label">Phone #</label>  
+    <div class="col-md-4 inputGroupContainer">
+    <div class="input-group">
+        <span class="input-group-addon"><i class="glyphicon glyphicon-earphone"></i></span>
+  <input id="phone_twelve" name="phone" placeholder="+6588881212" class="form-control" type="text">
+    </div>
+      <small class="form-text text-muted" style="" data-bv-validator="phone" data-bv-validator-for="phone">This is our ONLY way to contact the recipient.</small>
+  </div>
+</div>
+
+<!-- Text input-->
+      
+<div class="form-group">
+  <label class="col-md-4 control-label">Address</label>  
+    <div class="col-md-4 inputGroupContainer">
+    <div class="input-group">
+        <span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span>
+  <input id="address_twelve" name="address" placeholder="Address" class="form-control" type="text">
+    </div>
+  </div>
+</div>
+
+<!-- Text input-->
+ 
+<div class="form-group">
+  <label class="col-md-4 control-label">City</label>  
+    <div class="col-md-4 inputGroupContainer">
+    <div class="input-group">
+        <span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span>
+  <input id="city_twelve" name="city" placeholder="city" class="form-control"  type="text">
+    </div>
+  </div>
+</div>
+
+<!-- Text input-->
+
+<div class="form-group">
+  <label class="col-md-4 control-label">Zip Code</label>  
+    <div class="col-md-4 inputGroupContainer">
+    <div class="input-group">
+        <span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span>
+  <input id="postcode_twelve" name="postcode" placeholder="Postcode" class="form-control"  type="text">
+    </div>
+    </div>
+</div>
+
+<!-- Button -->
+<div class="form-group">
+  <label class="col-md-4 control-label"></label>
+  <div class="col-md-4">
+    <button type="submit" class="btn btn-warning" >Subscribe<span class="glyphicon glyphicon-send"></span></button>
+  </div>
+</div>
+
+</fieldset>
+</form>
+
+
+              </div>
+
+  </div>
+</div>
+
+<!-- 
+<form action="https://www.paypal.com/cgi-bin/webscr" id="payPalForm" method="post" target="_top">
+            <input type="hidden" name="business" value="leza@scbeautynetwork.com"> 
+--> 
+<form action="https://www.sandbox.paypal.com/cgi-bin/webscr" id="payPalForm" method="post" target="_top">
+            <input type="hidden" name="business" value="leza-facilitator@scbeautynetwork.com">
+            <input type="hidden" name="cmd" value="_xclick-subscriptions">
+            <input type="hidden" name="txn_type" value="subscr_signup">
+            <input type="hidden" name="notify_url" value="http://notify.parker.sg/notify/">
+            <input type="hidden" name="return" value="http://www.scbeautybox.com/">
+            <input type="hidden" name="cancel_return" value="http://www.scbeautybox.com/">
+            <input type="hidden" name="rm" value="2">
+            <!-- currency_code set by JS script below --> 
+            <input type="hidden" name="currency_code" id="set_currency" value="SGD">
+            <input type="hidden" name="item_name" id="set_item_name" value="Reseller Registration Fee">
+            <input type="hidden" name="custom" id="set_custom" value="">
+            <input type="hidden" name="quantity" value="1">
+            <input type="hidden" name="a3" id="set_monthly_charge" type="hidden" value="" />
+            <input type="hidden" name="p3" type="hidden" value="1" />
+            <input type="hidden" name="t3" type="hidden" value="M" />
+            <input type="hidden" name="src" type="hidden" value="1" />
+            <input type="hidden" name="srt" id="set_cycles" type="hidden" value="" />
+            <input type="hidden" name="cbt" value="Return to SC BEAUTY BOX">
+</form>
+
+<script>
+
+  // Six should be the larger number.
+  // ********************************
+  var chargeSix = 31.90;
+  var chargeTwelve = 30.50;
+  var discountedChargeSix = 31;
+  var discountedChargeTwelve = 29.48;
+  var country = 'SG';
+  var currency = 'SGD';
+  // ********************************
+
+  document.getElementById('set_currency').value = currency;
+
+  function toggle_visibility(id) {
+    var e = document.getElementById(id);
+    if (e.style.display == 'block' || e.style.display=='') {
+      e.style.display = 'none';   
+    } else {
+      e.style.display = 'block';
+      window.location.hash = '#' + id;
+    }
+  }
+
+  String.prototype.escapeSpecialChars = function() {
+    return this.replace(/\\n/g, "\\n")
+               .replace(/\\'/g, "\\'")
+               .replace(/\\"/g, '\\"')
+               .replace(/\\&/g, "\\&")
+               .replace(/\\r/g, "\\r")
+               .replace(/\\t/g, "\\t")
+               .replace(/\\b/g, "\\b")
+               .replace(/\\f/g, "\\f");
+  };
+
+  document.getElementById('coupon_input_six').onkeyup = function(event) {
+    this.value = this.value.replace(/[^A-Z\d]/, '');
+  }
+  document.getElementById('coupon_input_twelve').onkeyup = function(event) {
+    this.value = this.value.replace(/[^A-Z\d]/, '');
+  }
+
+  var codeSix;
+  var firstNameSix;
+  var lastNameSix;
+  var phoneSix;
+  var addressSix;
+  var citySix;
+  var postcodeSix;
+
+  var codeTwelve;
+  var firstNameTwelve;
+  var lastNameTwelve;
+  var phoneTwelve;
+  var addressTwelve;
+  var cityTwelve;
+  var postcodeTwelve;
+
+  var formSix = document.getElementById('check_coupon_six');
+  var formTwelve = document.getElementById('check_coupon_twelve');
+  if (formSix.attachEvent) {
+    formSix.attachEvent("submit", callWithSix);
+  } else {
+    formSix.addEventListener("submit", callWithSix);
+  }
+  if (formTwelve.attachEvent) {
+    formTwelve.attachEvent("submit", callWithTwelve);
+  } else {
+    formTwelve.addEventListener("submit", callWithTwelve);
+  }
+
+  var isIE8 = window.XDomainRequest ? true : false;
+  var url = 'http://notify.parker.sg/couponcode/';
+  var invocationSix = createCrossDomainRequest();
+  var invocationTwelve = createCrossDomainRequest();
+  function createCrossDomainRequest(url, handler) {
+    var request;
+    if (isIE8) {
+      request = new window.XDomainRequest();
+      }
+      else {
+        request = new XMLHttpRequest();
+      }
+    return request;
+  }
+
+// ----------------------
+// Six month functions
+// ----------------------
+  function callWithSix(e) {
+    if (e.preventDefault) e.preventDefault();
+    codeSix = document.getElementById("coupon_input_six").value.escapeSpecialChars();
+    firstNameSix = document.getElementById("first_name_six").value.escapeSpecialChars();
+    lastNameSix = document.getElementById("last_name_six").value.escapeSpecialChars();
+    phoneSix = document.getElementById("phone_six").value.escapeSpecialChars();
+    addressSix = document.getElementById("address_six").value.escapeSpecialChars();
+    citySix = document.getElementById("city_six").value.escapeSpecialChars();
+    postcodeSix = document.getElementById("postcode_six").value.escapeSpecialChars();
+
+    if (codeSix == "") {
+      // Post 6 month subscription to Paypal without coupon code (No discount).
+      document.getElementById('set_custom').value = '{"coupon":"", "firstname":"' + firstNameSix + '", "lastname":"' + lastNameSix + '", "phone":"' + phoneSix + '", "address":"' + addressSix + '", "city":"' + citySix + '", "postcode":"' + postcodeSix + '"}';
+      document.getElementById('set_item_name').value = country + ' Beauty Box 6 months';
+      document.getElementById('set_monthly_charge').value = chargeSix;
+      document.getElementById('set_cycles').value = '6';
+      document.getElementById('payPalForm').submit();
+    } else {
+        if (invocationSix) {
+          if(isIE8) {
+            invocationSix.onload = switchPaypalSix;
+            invocationSix.open("GET", url + codeSix, true);
+            invocationSix.send();
+          }
+          else {
+            invocationSix.open('GET', url + codeSix, true);
+            invocationSix.onreadystatechange = handlerSix;
+            invocationSix.send();
+          }
+        }
+        else {
+          alert("No Invocation Took Place At All");
+        }
+    }
+    // You must return false to prevent the default form behavior
+    return false;
+  }
+
+  function handlerSix(evtXHR) {
+    if (invocationSix.readyState == 4)
+    {
+      if (invocationSix.status == 200) {
+          switchPaypalSix();
+      }
+      else {
+        alert("Unable to verify code");
+      }
+    }
+  }
+
+  function switchPaypalSix() {
+    var response = invocationSix.responseText;
+    if (response == "true") {
+      // Post 6 month subscription to Paypal with coupon code (With discount).
+      document.getElementById('set_custom').value = '{"coupon":"' + codeSix + '", "firstname":"' + firstNameSix + '", "lastname":"' + lastNameSix + '", "phone":"' + phoneSix + '", "address":"' + addressSix + '", "city":"' + citySix + '", "postcode":"' + postcodeSix + '"}';
+      document.getElementById('set_item_name').value = country + ' Beauty Box 6 months (Discounted)';
+      document.getElementById('set_monthly_charge').value = discountedChargeSix;
+      document.getElementById('set_cycles').value = '6';
+      document.getElementById('payPalForm').submit();
+    } else {
+      alert("Invalid discount code. Please enter a valid code, or leave blank.");
+    }
+  }
+
+// ----------------------
+// Twelve month functions
+// ----------------------
+  function callWithTwelve(e) {
+    if (e.preventDefault) e.preventDefault();
+    codeTwelve = document.getElementById("coupon_input_twelve").value.escapeSpecialChars();
+    firstNameTwelve = document.getElementById("first_name_twelve").value.escapeSpecialChars();
+    lastNameTwelve = document.getElementById("last_name_twelve").value.escapeSpecialChars();
+    phoneTwelve = document.getElementById("phone_twelve").value.escapeSpecialChars();
+    addressTwelve = document.getElementById("address_twelve").value.escapeSpecialChars();
+    cityTwelve = document.getElementById("city_twelve").value.escapeSpecialChars();
+    postcodeTwelve = document.getElementById("postcode_twelve").value.escapeSpecialChars();
+
+    if (codeTwelve == "") {
+      // Post 12 month subscription to Paypal without coupon code (No discount).
+      document.getElementById('set_custom').value = '{"coupon":"", "firstname":"' + firstNameTwelve + '", "lastname":"' + lastNameTwelve + '", "phone":"' + phoneTwelve + '", "address":"' + addressTwelve + '", "city":"' + cityTwelve + '", "postcode":"' + postcodeTwelve + '"}';
+      document.getElementById('set_item_name').value = country + ' Beauty Box 12 months';
+      document.getElementById('set_monthly_charge').value = chargeTwelve;
+      document.getElementById('set_cycles').value = '12';
+      document.getElementById('payPalForm').submit();
+    } else {
+        if (invocationTwelve) {
+          if(isIE8) {
+            invocationTwelve.onload = switchPaypalTwelve;
+            invocationTwelve.open("GET", url + codeTwelve, true);
+            invocationTwelve.send();
+          }
+          else {
+            invocationTwelve.open('GET', url + codeTwelve, true);
+            invocationTwelve.onreadystatechange = handlerTwelve;
+            invocationTwelve.send();
+          }
+        }
+        else {
+          alert("No Invocation Took Place At All");
+        }
+    }
+    // You must return false to prevent the default form behavior
+    return false;
+  }
+
+  function handlerTwelve(evtXHR) {
+    if (invocationTwelve.readyState == 4)
+    {
+      if (invocationTwelve.status == 200) {
+          switchPaypalTwelve();
+      }
+      else {
+        alert("Unable to verify code");
+      }
+    }
+  }
+
+  function switchPaypalTwelve() {
+    var response = invocationTwelve.responseText;
+    if (response == "true") {
+      // Post 12 month subscription to Paypal with coupon code (With discount).
+      document.getElementById('set_custom').value = '{"coupon":"' + codeTwelve + '", "firstname":"' + firstNameTwelve + '", "lastname":"' + lastNameTwelve + '", "phone":"' + phoneTwelve + '", "address":"' + addressTwelve + '", "city":"' + cityTwelve + '", "postcode":"' + postcodeTwelve + '"}';
+      document.getElementById('set_item_name').value = country + ' Beauty Box 12 months (Discounted)';
+      document.getElementById('set_monthly_charge').value = discountedChargeTwelve;
+      document.getElementById('set_cycles').value = '12';
+      document.getElementById('payPalForm').submit();
+    } else {
+      alert("Invalid discount code. Please enter a valid code, or leave blank.");
+    }
+  }
+</script>
+
+
+  <div class="container">
+    {{with .ColorVariation }}
+      <div class="products__details">
+        <div class="row">
+          <div class="column column-8 products__gallery">
+
+            <div class="swiper-container products__gallery--top">
+              <ul class="slides">
+                {{range $image := .Images.Files}}
+                  <li style="background-image:url({{$image.URL}})"></li>
+                {{end}}
+              </ul>
+            </div>
+
+            <div class="swiper-container products__gallery--thumbs">
+              <ul class="slides">
+                {{range $image := .Images.Files}}
+                  <li style="background-image:url({{$image.URL}})"></li>
+                {{end}}
+              </ul>
+            </div>
+          </div>
+
+          <div class="column column-4 products__meta">
+            <h1>{{.Product.Name}}</h1>
+            <p class="products__meta--price">${{.Product.Price}}</p>
+            <ul>
+              <li>
+                <strong>{{ t "product.color" }}</strong>
+                <span>{{.Color.Name}}</span>
+                <div class="products__meta--color">
+                  <span class="selected" style="background: #F6841C"></span>
+                  <span style="background: #25A5DF"></span>
+                  <span style="background: #80DA7A"></span>
+                  <span style="background: #FFD322"></span>
+                  <span style="background: #77969E"></span>
+                  <span style="background: #2F2F2F"></span>
+                </div>
+              </li>
+
+              <li>
+                <strong>{{ t "product.size" }}</strong>
+                <select class="" name="domains">
+                  {{range .SizeVariations}}
+                    <option value="{{.Size.ID}}">{{.Size.Name}}</option>
+                  {{end}}
+                </select>
+                <a href="#">{{ t "product.size_guide" }}</a>
+              </li>
+
+              <li>
+                <strong>{{ t "product.quantity" }}</strong>
+                <div class="products__meta--qty">
+                  <a href="#" class="reduce">-</a>
+                  <a href="#" class="add">+</a>
+                  <input type="text" class="qty" />
+                </div>
+              </li>
+              <li>
+			  <!--
+			    <a href="/addtocart/{{ .Product.ID }}" class="button button__primary">+ {{ t "product.add_to_cart" }}</a>
+                <button type="submit" class="button button__primary">+ {{ t "product.add_to_cart" }}</button>
+				-->
+			    <form method="post" action="/addtocart/{{ .Product.ID }}">
+			      <button type="submit" class="button button__primary">+ {{ t "product.add_to_cart" }}</button>
+			    </form>
+              </li>
+            </ul>
+            <div class="products__details--share">
+              <a href="#"><img src="/images/icon-fav.png" height="24px" /> <span>{{ t "product.add_to_wishlist" }}</span></a>
+              <div>
+                <span>{{ t "product.share" }}</span>
+                <a href="#"><img src="/images/facebook-grey.png" height="24px" /></a>
+                <a href="#"><img src="/images/twitter-grey.png" height="24px" /></a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row products__info">
+
+          <div class="column column-4">
+            <h6>{{ t "product.description" }}</h6>
+            <p>{{raw .Product.Description}}</p>
+          </div>
+
+          <div class="column column-4">
+            <h6>{{ t "product.specs" }}</h6>
+            <div>
+              <label>{{ t "product.made_in" }}</label>
+              <p>{{.Product.MadeCountry}}</p>
+            </div>
+            <div>
+              <label>{{ t "product.materials" }}</label>
+              <p>Rubber soles, fabric uppers, plastic & metal zipper</p>
+            </div>
+          </div>
+
+          <div class="column column-4">
+            <div>
+              <label>{{ t "product.framistan" }}</label>
+              <p>Me non paenitet nullum festiviorem excogitasse ad hoc. Etiam habebis sem dicantur magna mollis euismod.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    {{end}}
+
+  </div>
+
+  <script src="/vendors/jquery.flexslider-min.js"></script>
+{{end}}
+

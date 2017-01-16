@@ -849,6 +849,25 @@ func init() {
 			}
 		},
 	})
+	user.Meta(&admin.Meta{Name: "PaypalEmail",
+		Label: "Paypal Email",
+		Type:  "readonly",
+		Valuer: func(record interface{}, context *qor.Context) interface{} {
+			influencerCoupon := &models.InfluencerCoupon{}
+			user := record.(*models.User)
+			if err := context.GetDB().Where("user_id = ?", user.ID).First(influencerCoupon).Error; err != nil {
+				if err.Error() == "record not found" {
+					return ""
+				} else {
+					// Ooops, we found a real error
+					fmt.Println("Error fetching coupon: ", err.Error())
+					return ""
+				}
+			} else {
+				return influencerCoupon.PaypalEmail
+			}
+		},
+	})
 	user.Meta(&admin.Meta{Name: "Confirmed", Valuer: func(user interface{}, ctx *qor.Context) interface{} {
 		if user.(*models.User).ID == 0 {
 			return true
@@ -873,6 +892,7 @@ func init() {
 				{"Email", "Password"},
 				{"Gender", "Role"},
 				{"InfluencerCode"},
+				{"PaypalEmail"},
 				{"Confirmed"},
 			}},
 		"Addresses",
@@ -949,6 +969,25 @@ func init() {
 			}
 		},
 	})
+	influencerDetails.Meta(&admin.Meta{Name: "PaypalEmail",
+		Label: "Paypal Email",
+		Type:  "readonly",
+		Valuer: func(record interface{}, context *qor.Context) interface{} {
+			influencerCoupon := &models.InfluencerCoupon{}
+			user := record.(*models.User)
+			if err := context.GetDB().Where("user_id = ?", user.ID).First(influencerCoupon).Error; err != nil {
+				if err.Error() == "record not found" {
+					return ""
+				} else {
+					// Ooops, we found a real error
+					fmt.Println("Error fetching coupon: ", err.Error())
+					return ""
+				}
+			} else {
+				return influencerCoupon.PaypalEmail
+			}
+		},
+	})
 	influencerDetails.Meta(&admin.Meta{Name: "Confirmed", Valuer: func(user interface{}, ctx *qor.Context) interface{} {
 		if user.(*models.User).ID == 0 {
 			return true
@@ -965,6 +1004,7 @@ func init() {
 				{"Email", "Password"},
 				{"Gender", "Role"},
 				{"InfluencerCode"},
+				{"PaypalEmail"},
 			}},
 		"Addresses",
 	)

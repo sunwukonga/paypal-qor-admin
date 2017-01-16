@@ -195,13 +195,16 @@ func IpnReceiver(ctx *gin.Context) {
 				}
 				subscription.EotAt = eotAt
 				paypalPayment := models.PaypalPayment{}
-				if err := DB(ctx).Where("subscr_id = ?", subscription.SubscrID).Model(&paypalPayment); err == nil {
+				if err := DB(ctx).Where("subscr_id = ?", subscription.SubscrID).First(&paypalPayment).Error; err == nil {
 					if eventErr := models.SubscriptionState.Trigger(models.EventSignup, subscription, DB(ctx)); eventErr != nil {
 						IPNLogger.Println("**********************************************************************")
 						IPNLogger.Println("Error, EventSignup:", eventErr.Error())
 						IPNLogger.Println("**********************************************************************")
 					}
 				} else {
+					IPNLogger.Println("**********************************************************************")
+					IPNLogger.Println("Error, check_Subscr_id:", err.Error())
+					IPNLogger.Println("**********************************************************************")
 					if eventErr := models.SubscriptionState.Trigger(models.EventSignunpaid, subscription, DB(ctx)); eventErr != nil {
 						IPNLogger.Println("**********************************************************************")
 						IPNLogger.Println("Error, EventSignunpaid:", eventErr.Error())
@@ -359,6 +362,9 @@ func IpnReceiver(ctx *gin.Context) {
 				influencerCoupon := &models.InfluencerCoupon{}
 				influencerID, _ := strconv.Atoi(custom["influencer_id"])
 				influencerCoupon.UserID = uint(influencerID)
+				if len(values["payer_email"]) > 0 {
+					influencerCoupon.PaypalEmail = values["payer_email"][0]
+				}
 				searchCoupon := &models.InfluencerCoupon{}
 				if values["payment_status"][0] == "Completed" {
 

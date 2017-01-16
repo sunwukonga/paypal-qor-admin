@@ -39,9 +39,10 @@ type User struct {
 
 type InfluencerCoupon struct {
 	gorm.Model
-	Code   string
-	User   User
-	UserID uint
+	Code        string
+	User        User
+	UserID      uint
+	PaypalEmail string
 
 	// Active if they have paid for a box
 	Active bool

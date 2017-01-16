@@ -114,7 +114,7 @@ func NewSubscription(coupon string, paypalPayer *PaypalPayer, db *gorm.DB) *Subs
 	}
 
 	subscription.UserID = paypalPayer.UserID
-	SubscriptionState.Trigger("signup", &subscription, db)
+	SubscriptionState.Trigger(EventSignunpaid, &subscription, db)
 	return &subscription
 }
 
@@ -161,18 +161,25 @@ func init() {
 	SubscriptionState.State(stateEOT)
 
 	// Define Subscription's Events
-	SubscriptionState.Event(EventSignup).To(stateActive).From(stateDraft).After(func(value interface{}, tx *gorm.DB) error {
+	SubscriptionState.Event(EventSignup).To(stateActive).From(stateUnpaid).After(func(value interface{}, tx *gorm.DB) error {
 		subscription := value.(*Subscription)
 		subscription.SetState(stateActive)
-		return tx.Create(subscription).Error
+		return tx.Model(value).UpdateColumns(subscription).Error
 	})
-	SubscriptionState.Event(EventSignunpaid).To(stateUnpaid).From(stateDraft).After(func(value interface{}, tx *gorm.DB) error {
+	signUnpaidEvent := SubscriptionState.Event(EventSignunpaid)
+	signUnpaidEvent.To(stateUnpaid).From(stateUnpaid).After(func(value interface{}, tx *gorm.DB) error {
+		subscription := value.(*Subscription)
+		subscription.SetState(stateUnpaid)
+		return tx.Model(value).UpdateColumns(subscription).Error
+	})
+	signUnpaidEvent.To(stateUnpaid).From(stateDraft).After(func(value interface{}, tx *gorm.DB) error {
 		subscription := value.(*Subscription)
 		subscription.SetState(stateUnpaid)
 		return tx.Create(subscription).Error
 	})
 
 	paymentEvent := SubscriptionState.Event(EventPayment)
+	paymentEvent.To(stateActive).From(stateDraft)
 	paymentEvent.To(stateActive).From(stateActive)
 	paymentEvent.To(stateActive).From(stateUnpaid)
 

@@ -41,7 +41,7 @@ func init() {
 	Auth.LayoutFuncMaker = layoutFunc
 	Auth.LayoutDataMaker = layoutData
 	Auth.Mailer = authboss.SMTPMailer(config.Config.SMTP.HostWithPort(), smtp.PlainAuth("", config.Config.SMTP.User, config.Config.SMTP.Password, config.Config.SMTP.Host))
-	Auth.EmailFrom = "paul@scbeautynetwork.com"
+	Auth.EmailFrom = config.Config.SMTP.User
 	Auth.RootURL = config.Config.SMTP.Site
 	Auth.Policies = []authboss.Validator{
 		authboss.Rules{

@@ -33,6 +33,9 @@ func Router() *http.ServeMux {
 		router.GET("/", func(c *gin.Context) {
 			c.Redirect(302, "/admin")
 		})
+		router.POST("/", func(c *gin.Context) {
+			c.Redirect(302, "/admin")
+		})
 		router.GET("/products/:code", controllers.ProductShow)
 		router.GET("/cart", controllers.CartShow)
 		router.GET("/switch_locale", controllers.SwitchLocale)

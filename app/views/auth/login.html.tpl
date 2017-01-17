@@ -7,6 +7,10 @@
                         {{if .error}}
                             <li class="error">{{.error}}</li>
                         {{end}}
+        				{{if or .flash_success .flash_error}}
+            				{{with .flash_success}}<div class="alert alert-success">{{.}}</div>{{end}}
+            				{{with .flash_error}}<div class="alert alert-danger">{{.}}</div>{{end}}
+						{{end}}
                         <li>
                             <label for="{{.primaryID}}">{{ t "login.email" }}</label>
                             <input type="text" class="form-control" name="{{.primaryID}}" placeholder="{{title .primaryID}}" value="{{.primaryIDValue}}">

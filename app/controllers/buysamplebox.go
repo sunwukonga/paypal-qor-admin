@@ -45,6 +45,7 @@ func BuySampleBox(ctx *gin.Context) {
 				Image:       colorVariation.MainImageURL(),
 			}.Render(),
 			"CurrentUser":   CurrentUser(ctx),
+			"IsAdminUser":   IsAdminUser(ctx),
 			"CurrentLocale": CurrentLocale(ctx),
 		},
 		ctx.Request,

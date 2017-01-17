@@ -35,6 +35,13 @@ func CurrentUser(ctx *gin.Context) *models.User {
 	return nil
 }
 
+func IsAdminUser(ctx *gin.Context) bool {
+	if CurrentUser(ctx).Role == models.RoleAdmin {
+		return true
+	}
+	return false
+}
+
 func IsEditMode(ctx *gin.Context) bool {
 	return admin.ActionBar.EditMode(ctx.Writer, ctx.Request)
 }

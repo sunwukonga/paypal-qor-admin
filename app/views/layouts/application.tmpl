@@ -9,7 +9,9 @@
   </head>
   <body>
     <div class="page-wrap">
-        {{.Result.ActionBarTag}}
+		{{ if .Result.IsAdminUser }}
+        	{{.Result.ActionBarTag}}
+		{{end}}
 
         <div class="header">
           <header class="container">

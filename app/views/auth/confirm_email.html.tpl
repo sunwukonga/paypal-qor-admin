@@ -1,3 +1,9 @@
-<h1>Confirm your account</h1>
+<h1>Beauty Box Influencer Account Activation</h1>
 <br />
-<p>Please click <a href="{{.}}">here</a> to confirm your account</p>
+<a href="{{.}}"><img src="http://notify.parker.sg/images/sc_confirm_account.png" /></a>
+<br />
+<br />
+<p>Please click confirm above, or follow this <a href="{{.}}">link</a> to activate your scbeautybox influencer account.</p>
+<br />
+<p>Otherwise, if your email client does not allow links or images, please copy and paste the following URL to your browser.</p>
+<p>{{.}}</p>

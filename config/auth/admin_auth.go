@@ -43,9 +43,7 @@ func (AdminAuth) LogoutURL(c *admin.Context) string {
 func (AdminAuth) GetCurrentUser(c *admin.Context) qor.CurrentUser {
 	userInter, err := Auth.CurrentUser(c.Writer, c.Request)
 	if userInter != nil && err == nil {
-		if userInter.(*models.User).Role == models.RoleAdmin {
-			return userInter.(*models.User)
-		}
+		return userInter.(*models.User)
 	}
 	return nil
 }

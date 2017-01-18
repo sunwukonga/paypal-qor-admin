@@ -1,7 +1,19 @@
 <div class="qor-page__body">
-  <div class="qor-section introduction">
-    <h5>Welcome to the SC BEAUTY BOX backend</h5>
-  </div>
+
+  {{ if eq .CurrentUser.Role "Influencer" }} 
+	  <div class="qor-section introduction">
+	  {{ if .CurrentUser.Name }}
+		<h5>Welcome {{ .CurrentUser.Name.String }}</h5>
+	  {{ else }}
+		<h5>Welcome {{ .CurrentUser.Email }}</h5>
+	  {{ end }}
+	  	<h6>Your Influencer Coupon Code is: <b>{{ .CurrentUser.Email }}</b></h6>
+	  </div>
+  {{ else }}
+	  <div class="qor-section introduction">
+		<h5>Welcome to the SC BEAUTY BOX backend</h5>
+	  </div>
+  {{ end }}
 
   <!-- if have table please add qor-section__table className -->
   <div class="qor-section qor-section__table">

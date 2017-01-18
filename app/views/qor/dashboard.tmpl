@@ -7,7 +7,7 @@
 	  {{ else }}
 		<h5>Welcome {{ .CurrentUser.Email }}</h5>
 	  {{ end }}
-	  	<h6>Your Influencer Coupon Code is: <b>{{ .CurrentUser.Email }}</b></h6>
+	  	<h6>Your Influencer Coupon Code is: <b>{{ render_coupon_code . }}</b></h6>
 	  </div>
   {{ else }}
 	  <div class="qor-section introduction">

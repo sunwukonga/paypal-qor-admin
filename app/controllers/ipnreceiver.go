@@ -159,11 +159,21 @@ func IpnReceiver(ctx *gin.Context) {
 					paypalPayer.User.Confirmed = true
 					paypalPayer.User.Addresses = []models.Address{
 						models.Address{
+							Description: models.DescriptionPaypal,
 							ContactName: paypalPayer.User.Name.String,
 							Country:     values["address_country"][0],
 							City:        values["address_city"][0],
 							Address1:    values["address_street"][0],
 							Postcode:    values["address_zip"][0],
+						},
+						models.Address{
+							Description: models.DescriptionDelivery,
+							ContactName: custom["firstname"] + " " + custom["lastname"],
+							Phone:       custom["phone"],
+							Country:     custom["country"],
+							City:        custom["city"],
+							Address1:    custom["address"],
+							Postcode:    custom["postcode"],
 						},
 					}
 					DB(ctx).Create(paypalPayer)
@@ -233,20 +243,39 @@ func IpnReceiver(ctx *gin.Context) {
 							if len(values["address_country"]) > 0 {
 								paypalPayer.User.Addresses = []models.Address{
 									models.Address{
+										Description: models.DescriptionPaypal,
 										ContactName: paypalPayer.User.Name.String,
 										Country:     values["address_country"][0],
 										City:        values["address_city"][0],
 										Address1:    values["address_street"][0],
 										Postcode:    values["address_zip"][0],
 									},
+									models.Address{
+										Description: models.DescriptionDelivery,
+										ContactName: custom["firstname"] + " " + custom["lastname"],
+										Phone:       custom["phone"],
+										Country:     custom["country"],
+										City:        custom["city"],
+										Address1:    custom["address"],
+										Postcode:    custom["postcode"],
+									},
 								}
 							} else {
 								paypalPayer.User.Addresses = []models.Address{
 									models.Address{
+										Description: models.DescriptionPaypal,
 										ContactName: paypalPayer.User.Name.String,
 										City:        values["address_city"][0],
 										Address1:    values["address_street"][0],
 										Postcode:    values["address_zip"][0],
+									},
+									models.Address{
+										Description: models.DescriptionDelivery,
+										ContactName: custom["firstname"] + " " + custom["lastname"],
+										Phone:       custom["phone"],
+										City:        custom["city"],
+										Address1:    custom["address"],
+										Postcode:    custom["postcode"],
 									},
 								}
 							}
@@ -382,6 +411,7 @@ func IpnReceiver(ctx *gin.Context) {
 					influencerId, _ := strconv.Atoi(custom["influencer_id"])
 					address := models.Address{
 						UserID:      uint(influencerId),
+						Description: models.DescriptionDelivery,
 						ContactName: custom["firstname"] + " " + custom["lastname"],
 						Phone:       custom["phone"],
 						Country:     custom["country"],

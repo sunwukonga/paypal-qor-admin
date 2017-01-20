@@ -6,9 +6,15 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
+const (
+	DescriptionPaypal   string = "Registered Paypal Address"
+	DescriptionDelivery string = "Delivery Address"
+)
+
 type Address struct {
 	gorm.Model
 	UserID      uint
+	Description string
 	ContactName string
 	Phone       string
 	Country     string

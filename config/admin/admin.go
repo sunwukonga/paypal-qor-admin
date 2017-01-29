@@ -13,6 +13,7 @@ import (
 
 	"golang.org/x/crypto/bcrypt"
 
+	"github.com/badoux/checkmail"
 	"github.com/jinzhu/gorm"
 	"github.com/qor/action_bar"
 	"github.com/qor/activity"
@@ -810,7 +811,56 @@ func init() {
 		},
 		Modes: []string{"show", "menu_item"},
 	})
-	user.Meta(&admin.Meta{Name: "Gender", Config: &admin.SelectOneConfig{Collection: []string{"Male", "Female", "Unknown"}}})
+	user.Meta(&admin.Meta{
+		Name: "Email",
+		Type: "text",
+		Setter: func(resource interface{}, metaValue *resource.MetaValue, context *qor.Context) {
+			values := metaValue.Value.([]string)
+			u := resource.(*models.User)
+			existingUser := &models.User{}
+
+			if len(values) > 0 {
+				if newEmail := values[0]; newEmail != "" {
+					// Check email format
+					if errFormat := checkmail.ValidateFormat(newEmail); errFormat != nil {
+						context.DB.AddError(validations.NewError(user, "Email", "Email format not valid!"))
+						return
+					}
+					// Check if email already exists in DB before checking with remote smtp host
+					if err := context.GetDB().Where("email = ?", newEmail).First(existingUser).Error; err == nil {
+						// No error, means we FOUND a record. That's not good. Abort.
+						context.DB.AddError(validations.NewError(user, "Email", "Email already in use!"))
+						return
+					}
+					// Catch Host and/or User does not exist
+					errHost := checkmail.ValidateHost(newEmail)
+					if smtpErr, ok := errHost.(checkmail.SmtpError); ok && errHost != nil {
+						context.DB.AddError(validations.NewError(user, "Email", smtpErr.Error()))
+						return
+					}
+					// The useful line. Everything else is validation.
+					u.Email = newEmail
+				} else {
+					// newEmail cannot be empty. Throw an error.
+					context.DB.AddError(validations.NewError(user, "Email", "Email cannot be empty!"))
+					return
+				}
+			}
+		},
+	})
+	user.Meta(&admin.Meta{
+		Name: "Gender",
+		Type: "select_one",
+		//Valuer: func(record interface{}, context *qor.Context) interface{} {
+		//	user := record.(*models.User)
+		//	return user.Gender
+		//},
+		//FormattedValuer: func(record interface{}, context *qor.Context) interface{} {
+		//		user := record.(*models.User)
+		//		return user.Gender
+		//	},
+		Config: &admin.SelectOneConfig{Collection: []string{"Male", "Female", "Unknown"}},
+	})
 	user.Meta(&admin.Meta{Name: "Role", Config: &admin.SelectOneConfig{Collection: models.Roles}})
 	user.Meta(&admin.Meta{Name: "Password",
 		Type:            "password",
@@ -883,7 +933,7 @@ func init() {
 		},
 	})
 
-	user.IndexAttrs("ID", "Email", "Name", "Gender", "Role")
+	user.IndexAttrs("ID", "Email", "Name", "Gender", "Role", "InfluencerCode")
 	user.ShowAttrs(
 		&admin.Section{
 			Title: "Basic Information",

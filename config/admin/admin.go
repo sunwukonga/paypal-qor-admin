@@ -43,7 +43,7 @@ var Countries = []string{"China", "Japan", "USA"}
 
 func init() {
 	Admin = admin.New(&qor.Config{DB: db.DB.Set("publish:draft_mode", true)})
-	Admin.SetSiteName("Qor DEMO")
+	Admin.SetSiteName("SC Beauty Box")
 	Admin.SetAuth(auth.AdminAuth{})
 	Admin.SetAssetFS(bindatafs.AssetFS)
 

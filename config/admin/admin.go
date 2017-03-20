@@ -933,6 +933,7 @@ func init() {
 		},
 	})
 
+	user.SearchAttrs("Email", "Name", "Gender", "Role")
 	user.IndexAttrs("ID", "Email", "Name", "Gender", "Role", "InfluencerCode")
 	user.ShowAttrs(
 		&admin.Section{

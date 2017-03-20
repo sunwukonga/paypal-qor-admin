@@ -36,8 +36,11 @@ func CurrentUser(ctx *gin.Context) *models.User {
 }
 
 func IsAdminUser(ctx *gin.Context) bool {
-	if CurrentUser(ctx).Role == models.RoleAdmin {
-		return true
+	currentUser := CurrentUser(ctx)
+	if currentUser != nil {
+		if currentUser.Role == models.RoleAdmin {
+			return true
+		}
 	}
 	return false
 }

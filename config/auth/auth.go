@@ -55,7 +55,7 @@ func init() {
 			FieldName:       "password",
 			Required:        true,
 			MinLength:       4,
-			MaxLength:       8,
+			MaxLength:       32,
 			AllowWhitespace: false,
 		},
 	}

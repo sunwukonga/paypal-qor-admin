@@ -34,7 +34,7 @@ type User struct {
 
 	// Recover
 	RecoverToken       string
-	RecoverTokenExpiry *time.Time
+	RecoverTokenExpiry time.Time
 }
 
 type InfluencerCoupon struct {

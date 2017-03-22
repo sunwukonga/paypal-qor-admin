@@ -826,11 +826,14 @@ func init() {
 						context.DB.AddError(validations.NewError(user, "Email", "Email format not valid!"))
 						return
 					}
-					// Check if email already exists in DB before checking with remote smtp host
-					if err := context.GetDB().Where("email = ?", newEmail).First(existingUser).Error; err == nil {
-						// No error, means we FOUND a record. That's not good. Abort.
-						context.DB.AddError(validations.NewError(user, "Email", "Email already in use!"))
-						return
+					// Check that email has NOT changed before checking that email exists for another user.
+					if strings.Compare(newEmail, u.Email) != 0 {
+						// Check if email already exists in DB before checking with remote smtp host
+						if err := context.GetDB().Where("email = ?", newEmail).First(existingUser).Error; err == nil {
+							// No error, means we FOUND a record. That's not good. Abort.
+							context.DB.AddError(validations.NewError(user, "Email", "Email already in use!"))
+							return
+						}
 					}
 					// Catch Host and/or User does not exist
 					errHost := checkmail.ValidateHost(newEmail)
